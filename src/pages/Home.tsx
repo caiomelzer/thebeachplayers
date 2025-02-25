@@ -1,3 +1,4 @@
+
 import { Search, Book, FileText, CheckSquare, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -45,12 +46,14 @@ const Home = () => {
         <p className="text-sm text-zinc-400 mb-3">
           Esta é a sua colocação em um total de 23457 atletas.
         </p>
-        <button 
-          onClick={() => navigate('/profile')}
-          className="text-sm text-zinc-400 hover:text-white transition-colors"
-        >
-          Ver mais detalhes
-        </button>
+        <div className="flex justify-center">
+          <button 
+            onClick={() => navigate('/profile')}
+            className="text-sm text-zinc-400 hover:text-white transition-colors"
+          >
+            Ver mais detalhes
+          </button>
+        </div>
       </div>
 
       {/* Shortcuts Section */}
@@ -58,64 +61,55 @@ const Home = () => {
         <h3 className="text-xl font-bold mb-4">Atalhos</h3>
         
         <div className="grid grid-cols-2 gap-4">
-          {/* Campeonatos Disputados */}
+          {/* Campeonatos Disponíveis */}
           <button 
-            onClick={() => navigate('/championships')}
+            onClick={() => navigate('/championships', { state: { initialFilter: 'finished' } })}
             className="bg-zinc-900 p-4 rounded-xl text-left"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="bg-blue-900 p-2 rounded-lg">
-                <Book className="w-5 h-5 text-white" />
-              </div>
-              <img
-                src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
-                alt="Profile"
-                className="w-6 h-6 rounded-full"
-              />
+            <div className="bg-blue-900 p-2 rounded-lg w-fit mb-2">
+              <Book className="w-5 h-5 text-white" />
             </div>
-            <p className="text-sm text-zinc-400 mb-1">Campeonatos</p>
-            <p className="font-medium mb-2">Disputados</p>
-            <span className="text-[#0EA5E9] text-2xl font-bold">13</span>
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-sm text-zinc-400">Campeonatos</p>
+                <p className="font-medium">Disponíveis</p>
+              </div>
+              <span className="text-[#0EA5E9] text-2xl font-bold">13</span>
+            </div>
           </button>
 
           {/* Campeonatos Inscritos */}
           <button 
-            onClick={() => navigate('/championships')}
+            onClick={() => navigate('/championships', { state: { initialFilter: 'registered' } })}
             className="bg-zinc-900 p-4 rounded-xl text-left"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="bg-orange-900 p-2 rounded-lg">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
-              <img
-                src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
-                alt="Profile"
-                className="w-6 h-6 rounded-full"
-              />
+            <div className="bg-orange-900 p-2 rounded-lg w-fit mb-2">
+              <FileText className="w-5 h-5 text-white" />
             </div>
-            <p className="text-sm text-zinc-400 mb-1">Campeonatos</p>
-            <p className="font-medium mb-2">Inscritos</p>
-            <span className="text-orange-500 text-2xl font-bold">4</span>
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-sm text-zinc-400">Campeonatos</p>
+                <p className="font-medium">Inscritos</p>
+              </div>
+              <span className="text-orange-500 text-2xl font-bold">4</span>
+            </div>
           </button>
 
           {/* Campeonatos Em breve */}
           <button 
-            onClick={() => navigate('/championships')}
+            onClick={() => navigate('/championships', { state: { initialFilter: 'soon' } })}
             className="bg-zinc-900 p-4 rounded-xl text-left"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="bg-purple-900 p-2 rounded-lg">
-                <CheckSquare className="w-5 h-5 text-white" />
-              </div>
-              <img
-                src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
-                alt="Profile"
-                className="w-6 h-6 rounded-full"
-              />
+            <div className="bg-purple-900 p-2 rounded-lg w-fit mb-2">
+              <CheckSquare className="w-5 h-5 text-white" />
             </div>
-            <p className="text-sm text-zinc-400 mb-1">Campeonatos</p>
-            <p className="font-medium mb-2">Em breve</p>
-            <span className="text-purple-500 text-2xl font-bold">15</span>
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-sm text-zinc-400">Campeonatos</p>
+                <p className="font-medium">Em breve</p>
+              </div>
+              <span className="text-purple-500 text-2xl font-bold">15</span>
+            </div>
           </button>
 
           {/* Convites Para jogar */}
@@ -123,19 +117,16 @@ const Home = () => {
             onClick={() => navigate('/championships')}
             className="bg-zinc-900 p-4 rounded-xl text-left"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="bg-green-900 p-2 rounded-lg">
-                <Users className="w-5 h-5 text-white" />
-              </div>
-              <img
-                src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
-                alt="Profile"
-                className="w-6 h-6 rounded-full"
-              />
+            <div className="bg-green-900 p-2 rounded-lg w-fit mb-2">
+              <Users className="w-5 h-5 text-white" />
             </div>
-            <p className="text-sm text-zinc-400 mb-1">Convites</p>
-            <p className="font-medium mb-2">Para jogar</p>
-            <span className="text-green-500 text-2xl font-bold">3</span>
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-sm text-zinc-400">Convites</p>
+                <p className="font-medium">Para jogar</p>
+              </div>
+              <span className="text-green-500 text-2xl font-bold">3</span>
+            </div>
           </button>
         </div>
       </div>

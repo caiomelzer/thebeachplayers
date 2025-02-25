@@ -2,14 +2,25 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle password reset logic here
+    if (validateEmail(email)) {
+      toast.success("Sua solicitação de redefinição de senha foi feita com sucesso, em breve você receberá um email. Até mais!");
+      setTimeout(() => navigate('/login'), 2000);
+    } else {
+      toast.error("Por favor, insira um email válido");
+    }
   };
 
   return (
@@ -24,13 +35,12 @@ const ForgotPassword = () => {
 
       <div className="flex-1 flex flex-col items-center mt-8">
         {/* Logo */}
-        <div className="flex flex-col items-center gap-2 mb-8">
+        <div className="flex items-center justify-center mb-12">
           <img 
             src="/lovable-uploads/logo.png"
             alt="The BeachPlayers Logo" 
-            className="w-16 h-16"
+            className="w-24 h-24"
           />
-          <h1 className="text-2xl font-bold text-white">The BeachPlayers</h1>
         </div>
 
         {/* Welcome Text */}

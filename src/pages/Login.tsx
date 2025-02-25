@@ -10,10 +10,15 @@ const Login = () => {
     password: "",
   });
 
+  const isFormValid = () => {
+    return formData.email.trim() !== "" && formData.password.trim() !== "";
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would handle authentication here
-    navigate('/home'); // Navigate to home after successful login
+    if (isFormValid()) {
+      navigate('/home');
+    }
   };
 
   return (
@@ -28,13 +33,12 @@ const Login = () => {
 
       <div className="flex-1 flex flex-col items-center mt-8">
         {/* Logo */}
-        <div className="flex flex-col items-center gap-2 mb-8">
+        <div className="flex items-center justify-center mb-12">
           <img 
             src="/lovable-uploads/logo.png"
             alt="The BeachPlayers Logo" 
-            className="w-16 h-16"
+            className="w-24 h-24"
           />
-          <h1 className="text-2xl font-bold text-white">The BeachPlayers</h1>
         </div>
 
         {/* Welcome Text */}
@@ -66,17 +70,20 @@ const Login = () => {
             />
           </div>
 
-          <button
-            type="button"
-            onClick={() => navigate('/forgot-password')}
-            className="text-[#0EA5E9] text-sm hover:underline w-full text-left"
-          >
-            Esqueci minha senha
-          </button>
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={() => navigate('/forgot-password')}
+              className="text-[#0EA5E9] text-sm hover:underline"
+            >
+              Esqueci minha senha
+            </button>
+          </div>
 
           <button 
             type="submit"
-            className="w-full bg-[#0EA5E9] text-white font-medium py-4 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors"
+            disabled={!isFormValid()}
+            className={`w-full ${isFormValid() ? 'bg-[#0EA5E9]' : 'bg-gray-500'} text-white font-medium py-4 rounded-lg transition-colors`}
           >
             Entrar
           </button>

@@ -10,11 +10,11 @@ const Index = () => {
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-black">
       <div className="w-full max-w-md space-y-8 px-4">
         {/* Logo */}
-        <div className="flex items-center gap-3 mb-12">
+        <div className="flex items-center justify-center mb-12">
           <img 
             src="/lovable-uploads/logo.png" 
             alt="The BeachPlayers Logo" 
-            className="w-12 h-12"
+            className="w-24 h-24"
           />
         </div>
 

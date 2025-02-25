@@ -2,6 +2,7 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -11,15 +12,85 @@ const Register = () => {
     cpf: "",
     password: "",
   });
+  const [errors, setErrors] = useState({
+    email: "",
+    cpf: "",
+    password: "",
+  });
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateCPF = (cpf: string) => {
+    const cleanCPF = cpf.replace(/[^\d]/g, '');
+    if (cleanCPF.length !== 11) return false;
+    
+    // CPF validation algorithm
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(cleanCPF[i]) * (10 - i);
+    }
+    let remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cleanCPF[9])) return false;
+
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(cleanCPF[i]) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cleanCPF[10])) return false;
+
+    return true;
+  };
+
+  const validatePassword = (password: string) => {
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Validate fields
+    if (field === 'email') {
+      setErrors(prev => ({
+        ...prev,
+        email: validateEmail(value) ? "" : "Email inválido"
+      }));
+    } else if (field === 'cpf') {
+      setErrors(prev => ({
+        ...prev,
+        cpf: validateCPF(value) ? "" : "CPF inválido"
+      }));
+    } else if (field === 'password') {
+      setErrors(prev => ({
+        ...prev,
+        password: validatePassword(value) 
+          ? "" 
+          : "A senha deve conter no mínimo 8 caracteres, um número e um caractere especial"
+      }));
+    }
+  };
+
+  const isFormValid = () => {
+    return validateEmail(formData.email) && 
+           validateCPF(formData.cpf) && 
+           validatePassword(formData.password);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle registration logic here
+    if (isFormValid()) {
+      // Handle registration logic here
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col p-6 bg-black">
-      {/* Back Button */}
       <button 
         onClick={() => navigate("/")}
         className="text-white p-2 rounded-lg bg-[#0EA5E9] w-fit"
@@ -29,13 +100,12 @@ const Register = () => {
 
       <div className="flex-1 flex flex-col items-center mt-8">
         {/* Logo */}
-        <div className="flex flex-col items-center gap-2 mb-8">
+        <div className="flex items-center justify-center mb-12">
           <img 
             src="/lovable-uploads/logo.png"
             alt="The BeachPlayers Logo" 
-            className="w-16 h-16"
+            className="w-24 h-24"
           />
-          <h1 className="text-2xl font-bold text-white">The BeachPlayers</h1>
         </div>
 
         {/* Welcome Text */}
@@ -49,10 +119,11 @@ const Register = () => {
               type="email"
               id="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full p-3 rounded-lg bg-white text-black"
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              className={`w-full p-3 rounded-lg bg-white text-black ${errors.email ? 'border-2 border-red-500' : ''}`}
               placeholder="Email"
             />
+            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
 
           <div className="space-y-2">
@@ -61,10 +132,11 @@ const Register = () => {
               type="text"
               id="cpf"
               value={formData.cpf}
-              onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-              className="w-full p-3 rounded-lg bg-white text-black"
+              onChange={(e) => handleInputChange('cpf', e.target.value)}
+              className={`w-full p-3 rounded-lg bg-white text-black ${errors.cpf ? 'border-2 border-red-500' : ''}`}
               placeholder="123.456.789-00"
             />
+            {errors.cpf && <p className="text-red-500 text-sm">{errors.cpf}</p>}
           </div>
 
           <div className="space-y-2">
@@ -73,14 +145,15 @@ const Register = () => {
               type="password"
               id="password"
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full p-3 rounded-lg bg-white text-black"
+              onChange={(e) => handleInputChange('password', e.target.value)}
+              className={`w-full p-3 rounded-lg bg-white text-black ${errors.password ? 'border-2 border-red-500' : ''}`}
               placeholder="********"
             />
+            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
 
           {/* Terms */}
-          <div className="mt-8">
+          <div className="mt-8 text-center">
             <p className="text-sm text-gray-400">
               Ao continuar, você aceita os{' '}
               <button 
@@ -95,7 +168,8 @@ const Register = () => {
 
           <button 
             type="submit"
-            className="w-full bg-[#0EA5E9] text-white font-medium py-4 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors mt-4"
+            disabled={!isFormValid()}
+            className={`w-full ${isFormValid() ? 'bg-[#0EA5E9]' : 'bg-gray-500'} text-white font-medium py-4 rounded-lg transition-colors mt-4`}
           >
             Cadastrar
           </button>
