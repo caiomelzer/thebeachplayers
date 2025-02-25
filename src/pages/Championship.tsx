@@ -5,6 +5,11 @@ import { useNavigate } from "react-router-dom";
 const Championship = () => {
   const navigate = useNavigate();
 
+  const handlePriceClick = () => {
+    const message = encodeURIComponent("Olá, gostaria de mais informações sobre os valores do campeonato.");
+    window.open(`https://wa.me/5511980872469?text=${message}`, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="relative">
@@ -71,11 +76,17 @@ const Championship = () => {
           {/* Pricing */}
           <div className="space-y-3">
             <h3 className="text-zinc-400">Valores</h3>
-            <button className="w-full bg-zinc-900 rounded-lg p-4 flex justify-between items-center">
+            <button 
+              onClick={handlePriceClick}
+              className="w-full bg-zinc-900 rounded-lg p-4 flex justify-between items-center"
+            >
               <span>Está é minha primeira categoria</span>
               <span className="text-[#0EA5E9]">R$110</span>
             </button>
-            <button className="w-full bg-zinc-900 rounded-lg p-4 flex justify-between items-center">
+            <button 
+              onClick={handlePriceClick}
+              className="w-full bg-zinc-900 rounded-lg p-4 flex justify-between items-center"
+            >
               <span>Já estou inscrito em outra categoria</span>
               <span className="text-[#0EA5E9]">R$90</span>
             </button>
@@ -85,7 +96,11 @@ const Championship = () => {
           <div className="space-y-3 pb-6">
             <h3 className="text-zinc-400">Participantes (12 inscritos)</h3>
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-zinc-900 rounded-lg p-4 flex items-center justify-between">
+              <button
+                key={i}
+                onClick={() => navigate('/complaint')}
+                className="w-full bg-zinc-900 rounded-lg p-4 flex items-center justify-between"
+              >
                 <div className="flex items-center gap-2">
                   <div className="flex -space-x-2">
                     <img
@@ -104,8 +119,8 @@ const Championship = () => {
                     <p>Ronaldinho Gaúcho</p>
                   </div>
                 </div>
-                <button className="text-zinc-400">!</button>
-              </div>
+                <div className="text-zinc-400">!</div>
+              </button>
             ))}
           </div>
         </div>
