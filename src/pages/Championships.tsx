@@ -1,3 +1,4 @@
+
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -12,10 +13,11 @@ const Championships = () => {
     {
       id: 1,
       title: "R2 - Segunda Etapa",
-      date: "2024-03-16", // Changed date format for proper comparison
+      date: "2024-03-16",
       category: "Dupla Mista Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
+      isRegistered: false,
       logo: "/lovable-uploads/logo-r2.png"
     },
     {
@@ -25,6 +27,7 @@ const Championships = () => {
       category: "Dupla Mista Intermediária",
       price: "R$90 por atleta",
       isDisabled: false,
+      isRegistered: true,
       logo: "/lovable-uploads/logo.png"
     },
     {
@@ -34,6 +37,7 @@ const Championships = () => {
       category: "Dupla Masculina Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
+      isRegistered: false,
       logo: "/lovable-uploads/logo-r2.png"
     },
     {
@@ -43,6 +47,7 @@ const Championships = () => {
       category: "Dupla Mista Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
+      isRegistered: false,
       logo: "/lovable-uploads/logo-r2.png"
     },
     {
@@ -52,6 +57,7 @@ const Championships = () => {
       category: "Dupla Mista Intermediária",
       price: "R$90 por atleta",
       isDisabled: false,
+      isRegistered: true,
       logo: "/lovable-uploads/logo.png"
     },
     {
@@ -61,6 +67,7 @@ const Championships = () => {
       category: "Dupla Masculina Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
+      isRegistered: false,
       logo: "/lovable-uploads/logo-r2.png"
     },
   ];
@@ -79,13 +86,20 @@ const Championships = () => {
     }
 
     // Apply active filter
-    if (activeFilter === 'soon') {
-      filtered = filtered.filter(championship => {
-        const championshipDate = parseISO(championship.date);
-        return isAfter(championshipDate, today) && isBefore(championshipDate, fifteenDaysFromNow);
-      });
+    switch (activeFilter) {
+      case 'soon':
+        filtered = filtered.filter(championship => {
+          const championshipDate = parseISO(championship.date);
+          return isAfter(championshipDate, today) && isBefore(championshipDate, fifteenDaysFromNow);
+        });
+        break;
+      case 'registered':
+        filtered = filtered.filter(championship => championship.isRegistered);
+        break;
+      default:
+        // 'all' case - no additional filtering needed
+        break;
     }
-    // Add other filter conditions if needed
 
     return filtered;
   };
