@@ -6,7 +6,6 @@ const Edit = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Add any logout logic here if needed
     navigate('/');
   };
 
@@ -32,6 +31,15 @@ const Edit = () => {
 
         <form className="max-w-md mx-auto space-y-4">
           <div className="space-y-2">
+            <label className="text-zinc-400">Nome completo:</label>
+            <input
+              type="text"
+              defaultValue="Kleber Utrilha"
+              className="w-full p-3 rounded-lg bg-zinc-900 text-white"
+            />
+          </div>
+
+          <div className="space-y-2">
             <label className="text-zinc-400">Apelido:</label>
             <input
               type="text"
@@ -41,10 +49,55 @@ const Edit = () => {
           </div>
 
           <div className="space-y-2">
+            <label className="text-zinc-400">CPF:</label>
+            <input
+              type="text"
+              defaultValue="123.456.789-00"
+              className="w-full p-3 rounded-lg bg-zinc-900 text-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-zinc-400">Data de nascimento:</label>
+            <input
+              type="date"
+              defaultValue="1990-01-01"
+              className="w-full p-3 rounded-lg bg-zinc-900 text-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-zinc-400">Telefone:</label>
+            <input
+              type="tel"
+              defaultValue="(11) 99999-9999"
+              className="w-full p-3 rounded-lg bg-zinc-900 text-white"
+            />
+          </div>
+
+          <div className="space-y-2">
             <label className="text-zinc-400">Email:</label>
             <input
               type="email"
               defaultValue="kleber123@teste.com.br"
+              className="w-full p-3 rounded-lg bg-zinc-900 text-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-zinc-400">Nova senha:</label>
+            <input
+              type="password"
+              placeholder="Digite a nova senha"
+              className="w-full p-3 rounded-lg bg-zinc-900 text-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-zinc-400">Confirmar nova senha:</label>
+            <input
+              type="password"
+              placeholder="Confirme a nova senha"
               className="w-full p-3 rounded-lg bg-zinc-900 text-white"
             />
           </div>

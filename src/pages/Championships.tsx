@@ -1,17 +1,18 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { addDays, isBefore, isAfter, parseISO } from "date-fns";
 
 const Championships = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<'all' | 'soon' | 'registered'>('soon');
+  const [activeFilter, setActiveFilter] = useState<'finished' | 'soon' | 'registered'>('soon');
   const [searchTerm, setSearchTerm] = useState("");
 
   const championships = [
     {
       id: 1,
       title: "R2 - Segunda Etapa",
-      date: "16/03/25",
+      date: "2024-03-16", // Changed date format for proper comparison
       category: "Dupla Mista Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
@@ -20,7 +21,7 @@ const Championships = () => {
     {
       id: 2,
       title: "R2 - Segunda Etapa",
-      date: "16/03/25",
+      date: "2024-03-16",
       category: "Dupla Mista Intermediária",
       price: "R$90 por atleta",
       isDisabled: false,
@@ -29,7 +30,7 @@ const Championships = () => {
     {
       id: 3,
       title: "R2 - Segunda Etapa",
-      date: "16/03/25",
+      date: "2024-03-16",
       category: "Dupla Masculina Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
@@ -38,7 +39,7 @@ const Championships = () => {
     {
       id: 4,
       title: "R2 - Segunda Etapa",
-      date: "16/03/25",
+      date: "2024-03-16",
       category: "Dupla Mista Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
@@ -47,7 +48,7 @@ const Championships = () => {
     {
       id: 5,
       title: "R2 - Segunda Etapa",
-      date: "16/03/25",
+      date: "2024-03-16",
       category: "Dupla Mista Intermediária",
       price: "R$90 por atleta",
       isDisabled: false,
@@ -56,7 +57,7 @@ const Championships = () => {
     {
       id: 6,
       title: "R2 - Segunda Etapa",
-      date: "16/03/25",
+      date: "2024-03-16",
       category: "Dupla Masculina Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
@@ -64,9 +65,37 @@ const Championships = () => {
     },
   ];
 
-  const filteredChampionships = championships.filter(championship => 
-    championship.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filterChampionships = () => {
+    const today = new Date();
+    const fifteenDaysFromNow = addDays(today, 15);
+
+    let filtered = championships;
+
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(championship =>
+        championship.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply active filter
+    if (activeFilter === 'soon') {
+      filtered = filtered.filter(championship => {
+        const championshipDate = parseISO(championship.date);
+        return isAfter(championshipDate, today) && isBefore(championshipDate, fifteenDaysFromNow);
+      });
+    }
+    // Add other filter conditions if needed
+
+    return filtered;
+  };
+
+  const filteredChampionships = filterChampionships();
+
+  const formatDisplayDate = (dateString: string) => {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year.slice(2)}`;
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -80,7 +109,7 @@ const Championships = () => {
             <ArrowLeft size={20} />
           </button>
           <h1 className="text-xl font-bold flex-1 text-center">Campeonatos</h1>
-          <div className="w-8"></div> {/* Spacer for centering */}
+          <div className="w-8"></div>
         </div>
 
         {/* Search Bar */}
@@ -97,12 +126,12 @@ const Championships = () => {
         {/* Filters */}
         <div className="grid grid-cols-3 gap-2 mb-6">
           <button 
-            onClick={() => setActiveFilter('all')}
+            onClick={() => setActiveFilter('finished')}
             className={`px-4 py-2 rounded-full text-center ${
-              activeFilter === 'all' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
+              activeFilter === 'finished' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
             }`}
           >
-            Todos
+            Encerrados
           </button>
           <button 
             onClick={() => setActiveFilter('soon')}
@@ -141,10 +170,10 @@ const Championships = () => {
               <div className="flex-1">
                 <h3 className="font-medium">{championship.title}</h3>
                 <p className="text-sm text-zinc-400">
-                  {championship.date} - {championship.category}
+                  {formatDisplayDate(championship.date)} - {championship.category}
                 </p>
                 <p className={`text-sm ${championship.isDisabled ? 'text-red-500' : 'text-zinc-400'}`}>
-                  A partir de {championship.status || championship.price}
+                  {championship.status || championship.price}
                 </p>
               </div>
               <div className="text-zinc-400">›</div>
