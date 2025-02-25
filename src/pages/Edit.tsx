@@ -5,6 +5,11 @@ import { useNavigate } from "react-router-dom";
 const Edit = () => {
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    // Add any logout logic here if needed
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="p-6">
@@ -46,9 +51,17 @@ const Edit = () => {
 
           <button 
             type="submit"
-            className="w-full bg-[#0EA5E9] text-white font-medium py-3 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors mt-6"
+            className="w-full bg-[#0EA5E9] text-white font-medium py-3 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors"
           >
             Salvar
+          </button>
+
+          <button 
+            type="button"
+            onClick={handleLogout}
+            className="w-full bg-zinc-800 text-white font-medium py-3 rounded-lg hover:bg-zinc-700 transition-colors"
+          >
+            Sair
           </button>
         </form>
       </div>

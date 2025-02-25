@@ -1,4 +1,3 @@
-
 import { Search, Book, FileText, CheckSquare, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -32,8 +31,8 @@ const Home = () => {
         {/* Sport Tags */}
         <div className="flex gap-4 text-sm">
           <span className="bg-[#0EA5E9] px-4 py-1 rounded-full">Vôlei</span>
-          <span className="bg-zinc-800 px-4 py-1 rounded-full">FutVôlei</span>
-          <span className="bg-zinc-800 px-4 py-1 rounded-full">Beach Tennis</span>
+          <span className="bg-zinc-800/50 text-zinc-400 px-4 py-1 rounded-full">FutVôlei</span>
+          <span className="bg-zinc-800/50 text-zinc-400 px-4 py-1 rounded-full">Beach Tennis</span>
         </div>
       </div>
 
@@ -61,7 +60,7 @@ const Home = () => {
         <h3 className="text-xl font-bold mb-4">Atalhos</h3>
         
         <div className="grid grid-cols-2 gap-4">
-          {/* Campeonatos Disponíveis */}
+          {/* First three shortcut buttons remain the same */}
           <button 
             onClick={() => navigate('/championships', { state: { initialFilter: 'finished' } })}
             className="bg-zinc-900 p-4 rounded-xl text-left"
@@ -112,22 +111,19 @@ const Home = () => {
             </div>
           </button>
 
-          {/* Convites Para jogar */}
-          <button 
-            onClick={() => navigate('/championships')}
-            className="bg-zinc-900 p-4 rounded-xl text-left"
-          >
-            <div className="bg-green-900 p-2 rounded-lg w-fit mb-2">
-              <Users className="w-5 h-5 text-white" />
+          {/* Convites Para jogar - now inactive */}
+          <div className="bg-zinc-900/50 p-4 rounded-xl text-left opacity-50 cursor-not-allowed">
+            <div className="bg-green-900/50 p-2 rounded-lg w-fit mb-2">
+              <Users className="w-5 h-5 text-white/50" />
             </div>
             <div className="flex justify-between items-end">
               <div>
                 <p className="text-sm text-zinc-400">Convites</p>
-                <p className="font-medium">Para jogar</p>
+                <p className="font-medium text-zinc-400">Para jogar</p>
               </div>
-              <span className="text-green-500 text-2xl font-bold">3</span>
+              <span className="text-green-500/50 text-2xl font-bold">3</span>
             </div>
-          </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,3 @@
-
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -6,6 +5,7 @@ import { useState } from "react";
 const Championships = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<'all' | 'soon' | 'registered'>('soon');
+  const [searchTerm, setSearchTerm] = useState("");
 
   const championships = [
     {
@@ -64,6 +64,10 @@ const Championships = () => {
     },
   ];
 
+  const filteredChampionships = championships.filter(championship => 
+    championship.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="p-6">
@@ -84,6 +88,8 @@ const Championships = () => {
           <input
             type="text"
             placeholder="Buscar"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-zinc-900 text-white px-4 py-3 rounded-lg"
           />
         </div>
@@ -118,7 +124,7 @@ const Championships = () => {
 
         {/* Championships List */}
         <div className="space-y-4">
-          {championships.map((championship) => (
+          {filteredChampionships.map((championship) => (
             <button
               key={championship.id}
               className="w-full bg-zinc-900 rounded-lg p-4 flex items-center text-left"
