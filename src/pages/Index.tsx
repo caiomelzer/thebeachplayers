@@ -10,7 +10,7 @@ const Index = () => {
         {/* Logo */}
         <div className="flex items-center gap-3 mb-12">
           <img 
-            src="/lovable-uploads/1b44280d-f89e-4ad3-8ab7-a0d24ccc47f3.png" 
+            src="/lovable-uploads/logo.png" 
             alt="The BeachPlayers Logo" 
             className="w-12 h-12"
           />
