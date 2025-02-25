@@ -5,7 +5,7 @@ import { useState } from "react";
 
 const Championships = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<'finished' | 'soon' | 'registered'>('soon');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'soon' | 'registered'>('soon');
 
   const championships = [
     {
@@ -15,6 +15,7 @@ const Championships = () => {
       category: "Dupla Mista Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
+      logo: "/lovable-uploads/logo-r2.png"
     },
     {
       id: 2,
@@ -23,6 +24,7 @@ const Championships = () => {
       category: "Dupla Mista Intermediária",
       price: "R$90 por atleta",
       isDisabled: false,
+      logo: "/lovable-uploads/logo.png"
     },
     {
       id: 3,
@@ -31,6 +33,7 @@ const Championships = () => {
       category: "Dupla Masculina Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
+      logo: "/lovable-uploads/logo-r2.png"
     },
   ];
 
@@ -61,9 +64,9 @@ const Championships = () => {
         {/* Filters */}
         <div className="grid grid-cols-3 gap-2 mb-6">
           <button 
-            onClick={() => setActiveFilter('finished')}
+            onClick={() => setActiveFilter('all')}
             className={`px-4 py-2 rounded-full text-center ${
-              activeFilter === 'finished' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
+              activeFilter === 'all' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
             }`}
           >
             Encerrados
@@ -97,7 +100,7 @@ const Championships = () => {
             >
               <div className="mr-4">
                 <img
-                  src="/lovable-uploads/logo.png"
+                  src={championship.logo}
                   alt="Championship logo"
                   className="w-12 h-12 rounded-lg"
                 />
