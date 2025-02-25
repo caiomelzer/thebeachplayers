@@ -13,7 +13,7 @@ const Championships = () => {
     {
       id: 1,
       title: "R2 - Segunda Etapa",
-      date: "2024-03-16",
+      date: "2024-03-01",
       category: "Dupla Mista Iniciante",
       status: "Você não pode participar desta categoria",
       isDisabled: true,
