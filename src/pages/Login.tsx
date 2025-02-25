@@ -37,7 +37,7 @@ const Login = () => {
           <img 
             src="/lovable-uploads/logo.png"
             alt="The BeachPlayers Logo" 
-            className="w-24 h-24"
+            className="w-32 h-24"
           />
         </div>
 

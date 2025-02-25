@@ -102,7 +102,7 @@ const Championships = () => {
               activeFilter === 'all' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
             }`}
           >
-            Encerrados
+            Todos
           </button>
           <button 
             onClick={() => setActiveFilter('soon')}
