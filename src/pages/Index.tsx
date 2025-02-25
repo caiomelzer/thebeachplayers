@@ -1,8 +1,10 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-black">
@@ -29,7 +31,10 @@ const Index = () => {
           <button className="w-full bg-[#0EA5E9] text-white font-medium py-4 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors">
             Entrar
           </button>
-          <button className="w-full bg-[#262626] text-white font-medium py-4 rounded-lg hover:bg-[#363636] transition-colors">
+          <button 
+            onClick={() => navigate('/register')}
+            className="w-full bg-[#262626] text-white font-medium py-4 rounded-lg hover:bg-[#363636] transition-colors"
+          >
             Cadastrar
           </button>
         </div>
