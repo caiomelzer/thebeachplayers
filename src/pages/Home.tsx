@@ -11,12 +11,16 @@ const Home = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-bold">Home</h1>
         <div className="flex items-center gap-4">
-          <Search className="w-5 h-5" />
-          <img
-            src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
-            alt="Profile"
-            className="w-8 h-8 rounded-full"
-          />
+          <button onClick={() => navigate('/championship')}>
+            <Search className="w-5 h-5" />
+          </button>
+          <button onClick={() => navigate('/edit')}>
+            <img
+              src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
+              alt="Profile"
+              className="w-8 h-8 rounded-full"
+            />
+          </button>
         </div>
       </div>
 
@@ -42,7 +46,10 @@ const Home = () => {
         <p className="text-sm text-zinc-400 mb-3">
           Esta é a sua colocação em um total de 23457 atletas.
         </p>
-        <button className="text-sm text-zinc-400 hover:text-white transition-colors">
+        <button 
+          onClick={() => navigate('/profile')}
+          className="text-sm text-zinc-400 hover:text-white transition-colors"
+        >
           Ver mais detalhes
         </button>
       </div>
@@ -53,7 +60,10 @@ const Home = () => {
         
         <div className="grid grid-cols-2 gap-4">
           {/* Campeonatos Disputados */}
-          <div className="bg-zinc-900 p-4 rounded-xl">
+          <button 
+            onClick={() => navigate('/championship')}
+            className="bg-zinc-900 p-4 rounded-xl text-left"
+          >
             <div className="flex justify-between items-start mb-4">
               <div className="bg-blue-900 p-2 rounded-lg">
                 <Book className="w-5 h-5 text-white" />
@@ -67,10 +77,13 @@ const Home = () => {
             <p className="text-sm text-zinc-400 mb-1">Campeonatos</p>
             <p className="font-medium mb-2">Disputados</p>
             <span className="text-[#0EA5E9] text-2xl font-bold">13</span>
-          </div>
+          </button>
 
           {/* Campeonatos Inscritos */}
-          <div className="bg-zinc-900 p-4 rounded-xl">
+          <button 
+            onClick={() => navigate('/championship')}
+            className="bg-zinc-900 p-4 rounded-xl text-left"
+          >
             <div className="flex justify-between items-start mb-4">
               <div className="bg-orange-900 p-2 rounded-lg">
                 <FileText className="w-5 h-5 text-white" />
@@ -84,10 +97,13 @@ const Home = () => {
             <p className="text-sm text-zinc-400 mb-1">Campeonatos</p>
             <p className="font-medium mb-2">Inscritos</p>
             <span className="text-orange-500 text-2xl font-bold">4</span>
-          </div>
+          </button>
 
           {/* Campeonatos Em breve */}
-          <div className="bg-zinc-900 p-4 rounded-xl">
+          <button 
+            onClick={() => navigate('/championship')}
+            className="bg-zinc-900 p-4 rounded-xl text-left"
+          >
             <div className="flex justify-between items-start mb-4">
               <div className="bg-purple-900 p-2 rounded-lg">
                 <CheckSquare className="w-5 h-5 text-white" />
@@ -101,10 +117,13 @@ const Home = () => {
             <p className="text-sm text-zinc-400 mb-1">Campeonatos</p>
             <p className="font-medium mb-2">Em breve</p>
             <span className="text-purple-500 text-2xl font-bold">15</span>
-          </div>
+          </button>
 
           {/* Convites Para jogar */}
-          <div className="bg-zinc-900 p-4 rounded-xl">
+          <button 
+            onClick={() => navigate('/championship')}
+            className="bg-zinc-900 p-4 rounded-xl text-left"
+          >
             <div className="flex justify-between items-start mb-4">
               <div className="bg-green-900 p-2 rounded-lg">
                 <Users className="w-5 h-5 text-white" />
@@ -118,7 +137,7 @@ const Home = () => {
             <p className="text-sm text-zinc-400 mb-1">Convites</p>
             <p className="font-medium mb-2">Para jogar</p>
             <span className="text-green-500 text-2xl font-bold">3</span>
-          </div>
+          </button>
         </div>
       </div>
     </div>
