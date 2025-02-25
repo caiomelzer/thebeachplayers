@@ -7,14 +7,6 @@
 
 @layer base {
   body {
-    @apply bg-background text-white font-sans antialiased;
+    @apply bg-black text-white font-sans antialiased;
   }
-}
-
-.btn-primary {
-  @apply bg-primary hover:bg-primary/90 text-white font-medium px-8 py-3 rounded-lg transition-all duration-200 ease-in-out;
-}
-
-.btn-secondary {
-  @apply bg-transparent hover:bg-white/10 text-white font-medium px-8 py-3 rounded-lg border border-white/20 transition-all duration-200 ease-in-out;
 }
