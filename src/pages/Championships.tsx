@@ -5,7 +5,7 @@ import { useState } from "react";
 
 const Championships = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<'all' | 'finished' | 'soon' | 'registered'>('all');
+  const [activeFilter, setActiveFilter] = useState<'finished' | 'soon' | 'registered'>('soon');
 
   const championships = [
     {
@@ -59,15 +59,7 @@ const Championships = () => {
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-2 gap-2 mb-6">
-          <button 
-            onClick={() => setActiveFilter('all')}
-            className={`px-4 py-2 rounded-full text-center ${
-              activeFilter === 'all' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
-            }`}
-          >
-            Todos
-          </button>
+        <div className="grid grid-cols-3 gap-2 mb-6">
           <button 
             onClick={() => setActiveFilter('finished')}
             className={`px-4 py-2 rounded-full text-center ${
