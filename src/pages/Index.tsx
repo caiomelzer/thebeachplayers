@@ -14,7 +14,7 @@ const Index = () => {
           <img 
             src="/lovable-uploads/logo.png" 
             alt="The BeachPlayers Logo" 
-            className="w-48 h-24"
+            className="w-92 h-24"
           />
         </div>
 
