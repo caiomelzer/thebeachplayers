@@ -12,37 +12,55 @@ const Complaint = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="p-6">
-        {/* Header */}
-        <div className="flex items-center mb-6">
-          <button 
-            onClick={() => navigate(-1)}
-            className="bg-[#0EA5E9] p-2 rounded-lg"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-xl font-bold flex-1 text-center">Denunciar</h1>
-          <div className="w-8"></div>
-        </div>
+      <div className="relative">
+        {/* Back Button */}
+        <button 
+          onClick={() => navigate(-1)}
+          className="absolute top-6 left-6 bg-[#0EA5E9] p-2 rounded-lg z-10"
+        >
+          <ArrowLeft size={20} />
+        </button>
 
-        {/* Complaint Options */}
-        <div className="space-y-4 mt-6">
-          <button 
+        {/* Championship Info */}
+        <div className="pt-20 px-6 text-center">
+          {/* Avatar Group */}
+          <div className="flex justify-center -space-x-4 mb-4">
+            <img
+              src="/lovable-uploads/logo.png"
+              alt="R2"
+              className="w-12 h-12 rounded-full border-2 border-black"
+            />
+            <img
+              src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
+              alt="Player 1"
+              className="w-12 h-12 rounded-full border-2 border-black"
+            />
+            <img
+              src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
+              alt="Player 2"
+              className="w-12 h-12 rounded-full border-2 border-black"
+            />
+          </div>
+
+          {/* Championship Title */}
+          <h1 className="text-2xl font-bold mb-2">R2 - Segunda Etapa</h1>
+          
+          {/* Players Names */}
+          <p className="text-lg mb-2">
+            Kleber Utrilha / Ronaldinho gaúcho
+          </p>
+
+          {/* Category */}
+          <p className="text-[#0EA5E9] text-lg mb-8">
+            Dupla Misto Intermediário
+          </p>
+
+          {/* Action Button */}
+          <button
             onClick={handleWrongCategory}
-            className="w-full bg-zinc-900 rounded-lg p-4 text-left flex items-center justify-between"
+            className="w-full bg-red-500 text-white py-3 px-6 rounded-lg font-medium"
           >
-            <span>Alertar categoria incorreta</span>
-            <span className="text-zinc-400">›</span>
-          </button>
-          
-          <button className="w-full bg-zinc-900 rounded-lg p-4 text-left flex items-center justify-between">
-            <span>Denunciar atleta</span>
-            <span className="text-zinc-400">›</span>
-          </button>
-          
-          <button className="w-full bg-zinc-900 rounded-lg p-4 text-left flex items-center justify-between">
-            <span>Reportar problema</span>
-            <span className="text-zinc-400">›</span>
+            Alertar categoria incorreta
           </button>
         </div>
       </div>
