@@ -12,7 +12,8 @@ const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
+    // In a real app, we would handle authentication here
+    navigate('/home'); // Navigate to home after successful login
   };
 
   return (
