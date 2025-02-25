@@ -35,6 +35,33 @@ const Championships = () => {
       isDisabled: true,
       logo: "/lovable-uploads/logo-r2.png"
     },
+    {
+      id: 4,
+      title: "R2 - Segunda Etapa",
+      date: "16/03/25",
+      category: "Dupla Mista Iniciante",
+      status: "Você não pode participar desta categoria",
+      isDisabled: true,
+      logo: "/lovable-uploads/logo-r2.png"
+    },
+    {
+      id: 5,
+      title: "R2 - Segunda Etapa",
+      date: "16/03/25",
+      category: "Dupla Mista Intermediária",
+      price: "R$90 por atleta",
+      isDisabled: false,
+      logo: "/lovable-uploads/logo.png"
+    },
+    {
+      id: 6,
+      title: "R2 - Segunda Etapa",
+      date: "16/03/25",
+      category: "Dupla Masculina Iniciante",
+      status: "Você não pode participar desta categoria",
+      isDisabled: true,
+      logo: "/lovable-uploads/logo-r2.png"
+    },
   ];
 
   return (
@@ -111,7 +138,7 @@ const Championships = () => {
                   {championship.date} - {championship.category}
                 </p>
                 <p className={`text-sm ${championship.isDisabled ? 'text-red-500' : 'text-zinc-400'}`}>
-                  {championship.status || championship.price}
+                  A partir de {championship.status || championship.price}
                 </p>
               </div>
               <div className="text-zinc-400">›</div>

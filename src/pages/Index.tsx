@@ -16,7 +16,6 @@ const Index = () => {
             alt="The BeachPlayers Logo" 
             className="w-12 h-12"
           />
-          <h1 className="text-2xl font-bold text-white">The BeachPlayers</h1>
         </div>
 
         {/* Main Content */}
