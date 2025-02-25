@@ -3,23 +3,20 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-const Login = () => {
+const ForgotPassword = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
+    // Handle password reset logic here
   };
 
   return (
     <div className="min-h-screen flex flex-col p-6 bg-black">
       {/* Back Button */}
       <button 
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/login")}
         className="text-white p-2 rounded-lg bg-[#0EA5E9] w-fit"
       >
         <ArrowLeft size={20} />
@@ -46,38 +43,18 @@ const Login = () => {
             <input
               type="email"
               id="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 rounded-lg bg-white text-black"
               placeholder="Email"
             />
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-white">Senha:</label>
-            <input
-              type="password"
-              id="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full p-3 rounded-lg bg-white text-black"
-              placeholder="********"
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={() => navigate('/forgot-password')}
-            className="text-[#0EA5E9] text-sm hover:underline w-full text-left"
-          >
-            Esqueci minha senha
-          </button>
-
           <button 
             type="submit"
             className="w-full bg-[#0EA5E9] text-white font-medium py-4 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors"
           >
-            Entrar
+            Enviar
           </button>
         </form>
       </div>
@@ -85,4 +62,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ForgotPassword;
