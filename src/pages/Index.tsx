@@ -28,7 +28,10 @@ const Index = () => {
 
         {/* Buttons */}
         <div className="space-y-3">
-          <button className="w-full bg-[#0EA5E9] text-white font-medium py-4 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors">
+          <button 
+            onClick={() => navigate('/login')}
+            className="w-full bg-[#0EA5E9] text-white font-medium py-4 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors"
+          >
             Entrar
           </button>
           <button 
