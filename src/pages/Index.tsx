@@ -12,7 +12,7 @@ const Index = () => {
         {/* Logo */}
         <div className="flex items-center justify-center mb-12">
           <img 
-            src="/lovable-uploads/logo.png" 
+            src="/lovable-uploads/logo-t.png" 
             alt="The BeachPlayers Logo" 
             className="w-92 h-24"
           />
