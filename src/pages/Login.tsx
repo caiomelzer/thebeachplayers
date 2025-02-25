@@ -34,10 +34,10 @@ const Login = () => {
       <div className="flex-1 flex flex-col items-center mt-8">
         {/* Logo */}
         <div className="flex items-center justify-center mb-12">
-          <img 
-            src="/lovable-uploads/logo.png"
+        <img 
+            src="/lovable-uploads/logo-t.png" 
             alt="The BeachPlayers Logo" 
-            className="w-32 h-24"
+            className="w-92 h-24"
           />
         </div>
 
