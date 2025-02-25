@@ -5,7 +5,7 @@ import { addDays, isBefore, isAfter, parseISO } from "date-fns";
 
 const Championships = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<'all' | 'soon' | 'registered'>('soon');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'soon' | 'registered'>('all');
   const [searchTerm, setSearchTerm] = useState("");
 
   const championships = [
@@ -128,7 +128,7 @@ const Championships = () => {
           <button 
             onClick={() => setActiveFilter('all')}
             className={`px-4 py-2 rounded-full text-center ${
-              activeFilter === 'finished' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
+              activeFilter === 'all' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
             }`}
           >
             Todos
