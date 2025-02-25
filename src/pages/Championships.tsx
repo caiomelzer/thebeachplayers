@@ -79,6 +79,7 @@ const Championships = () => {
               key={championship.id}
               className="w-full bg-zinc-900 rounded-lg p-4 flex items-center text-left"
               disabled={championship.isDisabled}
+              onClick={() => !championship.isDisabled && navigate(`/championship/${championship.id}`)}
             >
               <div className="mr-4">
                 <img

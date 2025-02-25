@@ -11,6 +11,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Championships from "./pages/Championships";
+import Championship from "./pages/Championship";
 import Edit from "./pages/Edit";
 import NotFound from "./pages/NotFound";
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/championships" element={<Championships />} />
+          <Route path="/championship/:id" element={<Championship />} />
           <Route path="/edit" element={<Edit />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
