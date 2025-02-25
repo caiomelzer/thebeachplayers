@@ -5,6 +5,7 @@ import { useState } from "react";
 
 const Register = () => {
   const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     cpf: "",
@@ -78,19 +79,19 @@ const Register = () => {
             />
           </div>
 
-        {/* Terms */}
-        <div className="mt-8">
-          <p className="text-sm text-gray-400">
-            Ao continuar, você aceita os{' '}
-            <button 
-              className="text-[#0EA5E9] hover:underline"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              termos de uso
-            </button>
-          </p>
-        </div>
+          {/* Terms */}
+          <div className="mt-8">
+            <p className="text-sm text-gray-400">
+              Ao continuar, você aceita os{' '}
+              <button 
+                className="text-[#0EA5E9] hover:underline"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                termos de uso
+              </button>
+            </p>
+          </div>
 
           <button 
             type="submit"
