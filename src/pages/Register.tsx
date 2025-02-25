@@ -78,9 +78,19 @@ const Register = () => {
             />
           </div>
 
-          <p className="text-white text-sm text-center mt-4">
-            Ao se cadastrar, você concorda com os termos de uso
+        {/* Terms */}
+        <div className="mt-8">
+          <p className="text-sm text-gray-400">
+            Ao continuar, você aceita os{' '}
+            <button 
+              className="text-[#0EA5E9] hover:underline"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              termos de uso
+            </button>
           </p>
+        </div>
 
           <button 
             type="submit"
