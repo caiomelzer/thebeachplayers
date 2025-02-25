@@ -1,4 +1,3 @@
-
 import { Search, Book, FileText, CheckSquare, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +10,7 @@ const Home = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-bold">Home</h1>
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/championship')}>
+          <button onClick={() => navigate('/championships')}>
             <Search className="w-5 h-5" />
           </button>
           <button onClick={() => navigate('/edit')}>
@@ -61,7 +60,7 @@ const Home = () => {
         <div className="grid grid-cols-2 gap-4">
           {/* Campeonatos Disputados */}
           <button 
-            onClick={() => navigate('/championship')}
+            onClick={() => navigate('/championships')}
             className="bg-zinc-900 p-4 rounded-xl text-left"
           >
             <div className="flex justify-between items-start mb-4">
@@ -81,7 +80,7 @@ const Home = () => {
 
           {/* Campeonatos Inscritos */}
           <button 
-            onClick={() => navigate('/championship')}
+            onClick={() => navigate('/championships')}
             className="bg-zinc-900 p-4 rounded-xl text-left"
           >
             <div className="flex justify-between items-start mb-4">
@@ -101,7 +100,7 @@ const Home = () => {
 
           {/* Campeonatos Em breve */}
           <button 
-            onClick={() => navigate('/championship')}
+            onClick={() => navigate('/championships')}
             className="bg-zinc-900 p-4 rounded-xl text-left"
           >
             <div className="flex justify-between items-start mb-4">
@@ -121,7 +120,7 @@ const Home = () => {
 
           {/* Convites Para jogar */}
           <button 
-            onClick={() => navigate('/championship')}
+            onClick={() => navigate('/championships')}
             className="bg-zinc-900 p-4 rounded-xl text-left"
           >
             <div className="flex justify-between items-start mb-4">
