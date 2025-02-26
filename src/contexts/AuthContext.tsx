@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import type { User, PlayerStatistics } from '@/types/database';
+import type { User} from '@/types/database';
 
 interface AuthContextType {
   user: User | null;
@@ -19,34 +19,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const fetchPlayerStatistics = async (userId: string): Promise<PlayerStatistics | null> => {
-    try {
-      const { data, error } = await supabase
-        .rpc('get_player_statistics', { player_id: userId });
-
-      if (error) {
-        console.error('Error fetching player statistics:', error);
-        return null;
-      }
-
-      if (data && typeof data === 'object') {
-        const stats = data as Record<string, number>;
-        return {
-          ranking: stats.ranking || 0,
-          victories: stats.victories || 0,
-          defeats: stats.defeats || 0,
-          totalChampionships: stats.totalChampionships || 0,
-          recentChampionships: stats.recentChampionships || 0
-        };
-      }
-
-      return null;
-    } catch (error) {
-      console.error('Error in fetchPlayerStatistics:', error);
-      return null;
-    }
-  };
-
   const fetchUserData = async (userId: string): Promise<User | null> => {
     try {
       const { data: userData, error } = await supabase
@@ -62,13 +34,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null;
       }
 
-      // Fetch player statistics
-      const statistics = await fetchPlayerStatistics(userId);
       
       // Combine user data with statistics
       return {
         ...userData,
-        statistics: statistics || undefined
       } as User;
     } catch (error) {
       console.error('Error fetching user data:', error);
