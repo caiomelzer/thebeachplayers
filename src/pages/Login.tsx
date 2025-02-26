@@ -2,9 +2,12 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -14,10 +17,16 @@ const Login = () => {
     return formData.email.trim() !== "" && formData.password.trim() !== "";
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isFormValid()) {
-      navigate('/home');
+      try {
+        await signIn(formData.email, formData.password);
+        toast.success("Login realizado com sucesso!");
+        navigate('/home');
+      } catch (error: any) {
+        toast.error("Email ou senha incorretos");
+      }
     }
   };
 
