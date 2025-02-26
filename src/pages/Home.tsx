@@ -7,6 +7,9 @@ const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Get the display name from profile or fall back to email
+  const displayName = user?.profile?.full_name || user?.profile?.nickname || user?.email?.split('@')[0] || 'Usuário';
+
   return (
     <div className="min-h-screen bg-black text-white p-6">
       {/* Header */}
@@ -18,7 +21,7 @@ const Home = () => {
           </button>
           <button onClick={() => navigate('/edit')}>
             <img
-              src="/lovable-uploads/kleber.png"
+              src={user?.profile?.avatar_url || "/lovable-uploads/kleber.png"}
               alt="Profile"
               className="w-8 h-8 rounded-full"
             />
@@ -29,7 +32,7 @@ const Home = () => {
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-1">Olá</h1>
-        <h2 className="text-4xl font-bold mb-4">{user?.email?.split('@')[0] || 'Usuário'}</h2>
+        <h2 className="text-4xl font-bold mb-4">{displayName}</h2>
         
         {/* Sport Tags */}
         <div className="flex gap-4 text-sm">

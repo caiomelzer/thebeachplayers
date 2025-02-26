@@ -3,10 +3,19 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
+interface Profile {
+  id: string;
+  cpf: string;
+  full_name: string | null;
+  nickname: string | null;
+  avatar_url: string | null;
+}
+
 interface User {
   id: string;
   email: string;
   document: string;
+  profile?: Profile;
 }
 
 interface AuthContextType {
@@ -24,15 +33,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const fetchUserData = async (userId: string) => {
+    try {
+      // Fetch user data from the users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id, email, document')
+        .eq('id', userId)
+        .single();
+
+      if (userError) throw userError;
+
+      // Fetch profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        // PGRST116 means no data found, which is ok - the profile might not exist yet
+        throw profileError;
+      }
+
+      return {
+        ...userData,
+        profile: profileData || undefined
+      };
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        const { data: userData } = await supabase
-          .from('users')
-          .select('id, email, document')
-          .eq('id', session.user.id)
-          .single();
-        
+        const userData = await fetchUserData(session.user.id);
         setUser(userData);
       } else {
         setUser(null);
@@ -69,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: data.user.id,
             email,
             document,
-            password: 'PROTECTED', // We don't store the actual password
+            password: 'PROTECTED',
           }
         ]);
 
@@ -87,15 +124,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) throw error;
 
-    // Fetch user data after successful sign in
     if (data.user) {
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id, email, document')
-        .eq('id', data.user.id)
-        .single();
-
-      if (userError) throw userError;
+      const userData = await fetchUserData(data.user.id);
       setUser(userData);
     }
 
