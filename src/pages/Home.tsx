@@ -1,5 +1,5 @@
 
-import { Search, Book, FileText, CheckSquare, Users } from "lucide-react";
+import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
@@ -128,6 +128,34 @@ const Home = () => {
               <span className="text-green-500 text-2xl font-bold">324</span>
             </div>
           </button>
+
+          {/* Arenas por perto Card (Inactive) */}
+          <div className="bg-zinc-800/50 p-4 rounded-xl text-left cursor-not-allowed">
+            <div className="bg-zinc-700 p-2 rounded-lg w-fit mb-2">
+              <MapPin className="w-5 h-5 text-zinc-400" />
+            </div>
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-sm text-zinc-500">Arenas</p>
+                <p className="text-zinc-500 font-medium">por perto</p>
+              </div>
+              <span className="text-zinc-500 text-2xl font-bold">8</span>
+            </div>
+          </div>
+
+          {/* Convites para jogar Card (Inactive) */}
+          <div className="bg-zinc-800/50 p-4 rounded-xl text-left cursor-not-allowed">
+            <div className="bg-zinc-700 p-2 rounded-lg w-fit mb-2">
+              <Mail className="w-5 h-5 text-zinc-400" />
+            </div>
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-sm text-zinc-500">Convites</p>
+                <p className="text-zinc-500 font-medium">para jogar</p>
+              </div>
+              <span className="text-zinc-500 text-2xl font-bold">3</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
