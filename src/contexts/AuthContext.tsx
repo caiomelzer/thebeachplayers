@@ -34,11 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null;
       }
 
-      
-      // Combine user data with statistics
-      return {
-        ...userData,
-      } as User;
+      return userData as User;
     } catch (error) {
       console.error('Error fetching user data:', error);
       return null;
@@ -46,7 +42,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Check initial session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const userData = await fetchUserData(session.user.id);
+        setUser(userData);
+      }
+      setLoading(false);
+    });
+
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session);
+      
       if (session?.user) {
         const userData = await fetchUserData(session.user.id);
         setUser(userData);
@@ -58,15 +66,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === 'SIGNED_OUT') {
           navigate('/login');
         }
-      }
-      setLoading(false);
-    });
-
-    // Check initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const userData = await fetchUserData(session.user.id);
-        setUser(userData);
       }
       setLoading(false);
     });
@@ -98,6 +97,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) throw error;
+
+      // If signup is successful and we have a session, navigate to home
+      if (data?.user) {
+        navigate('/home');
+      }
+
       return { data, error: null };
     } catch (error) {
       console.error('Signup error:', error);
@@ -117,6 +122,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.user) {
         const userData = await fetchUserData(data.user.id);
         setUser(userData);
+        // Explicitly navigate after successful signin
+        navigate('/home');
       }
 
       return { data, error: null };
@@ -129,6 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     setUser(null);
+    navigate('/login');
   };
 
   return (
