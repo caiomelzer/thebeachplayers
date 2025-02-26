@@ -46,6 +46,7 @@ const Index = () => {
           <p className="text-sm text-gray-400">
             Ao continuar, você aceita os{' '}
             <button 
+              onClick={() => navigate('/terms')}
               className="text-[#0EA5E9] hover:underline"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}

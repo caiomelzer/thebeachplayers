@@ -12,6 +12,8 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Championships from "./pages/Championships";
 import Championship from "./pages/Championship";
+import ChampionshipRules from "./pages/ChampionshipRules";
+import Terms from "./pages/Terms";
 import Complaint from "./pages/Complaint";
 import Edit from "./pages/Edit";
 import NotFound from "./pages/NotFound";
@@ -35,6 +37,8 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/championships" element={<Championships />} />
           <Route path="/championship/:id" element={<Championship />} />
+          <Route path="/championship/:id/rules" element={<ChampionshipRules />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="/players" element={<Players />} />
           <Route path="/player/:id" element={<PlayerProfile />} />
           <Route path="/complaint" element={<Complaint />} />

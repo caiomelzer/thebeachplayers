@@ -1,9 +1,10 @@
 
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Championship = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const handlePriceClick = () => {
     const message = encodeURIComponent("Olá, gostaria de mais informações sobre os valores do campeonato.");
@@ -69,7 +70,10 @@ const Championship = () => {
           </div>
 
           {/* Rules Button */}
-          <button className="w-full bg-zinc-900 rounded-lg p-4 text-left">
+          <button 
+            onClick={() => navigate(`/championship/${id}/rules`)}
+            className="w-full bg-zinc-900 rounded-lg p-4 text-left"
+          >
             <p className="text-center">Clique aqui para ler as regras</p>
           </button>
 
