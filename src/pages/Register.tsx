@@ -81,11 +81,13 @@ const Register = () => {
   const isFormValid = () => {
     return validateEmail(formData.email) && 
            validateCPF(formData.cpf) && 
-           validatePassword(formData.password);
+           validatePassword(formData.password) &&
+           !isLoading;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!isFormValid()) {
       toast.error("Por favor, corrija os erros no formulário");
       return;
@@ -93,15 +95,28 @@ const Register = () => {
 
     try {
       setIsLoading(true);
-      await signUp(formData.email, formData.password, formData.cpf);
+      console.log('Attempting to sign up with:', {
+        email: formData.email,
+        cpf: formData.cpf
+      });
+      
+      const { data, error } = await signUp(formData.email, formData.password, formData.cpf);
+      
+      if (error) {
+        throw error;
+      }
+
       toast.success("Cadastro realizado com sucesso! Verifique seu email para confirmar o cadastro.");
       navigate('/login');
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
+      
       if (error.message === 'CPF já cadastrado') {
         toast.error("CPF já cadastrado");
-      } else if (error.message.includes('Email already registered')) {
+      } else if (error.message?.includes('Email already registered')) {
         toast.error("Email já cadastrado");
+      } else if (error.message?.includes('Password should be at least 6 characters')) {
+        toast.error("A senha deve ter no mínimo 6 caracteres");
       } else {
         toast.error("Erro ao realizar cadastro. Por favor, tente novamente.");
       }
@@ -194,8 +209,8 @@ const Register = () => {
 
           <Button 
             type="submit"
-            disabled={!isFormValid() || isLoading}
-            className={`w-full ${isFormValid() && !isLoading ? 'bg-[#0EA5E9]' : 'bg-gray-500'} text-white font-medium py-4 rounded-lg transition-colors mt-4`}
+            disabled={!isFormValid()}
+            className={`w-full ${isFormValid() ? 'bg-[#0EA5E9]' : 'bg-gray-500'} text-white font-medium py-4 rounded-lg transition-colors mt-4`}
           >
             {isLoading ? 'Cadastrando...' : 'Cadastrar'}
           </Button>
