@@ -1,7 +1,7 @@
 
 import { ArrowLeft, Camera } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -21,6 +21,30 @@ const Edit = () => {
     gender: user?.gender || "",
   });
   const [selectedModalities, setSelectedModalities] = useState<Modality[]>([]);
+
+  useEffect(() => {
+    const fetchUserModalities = async () => {
+      if (!user) return;
+
+      try {
+        const { data: modalities, error } = await supabase
+          .from('user_modalities')
+          .select('modality')
+          .eq('user_id', user.id)
+          .eq('status', 'active');
+
+        if (error) throw error;
+
+        if (modalities) {
+          setSelectedModalities(modalities.map(m => m.modality));
+        }
+      } catch (error) {
+        console.error('Error fetching modalities:', error);
+      }
+    };
+
+    fetchUserModalities();
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -100,15 +124,15 @@ const Edit = () => {
 
       // Insert new modalities
       if (selectedModalities.length > 0) {
+        const modalitiesData = selectedModalities.map(modality => ({
+          user_id: user.id,
+          modality: modality as Modality,
+          status: 'active' as const
+        }));
+
         const { error: modalitiesError } = await supabase
           .from('user_modalities')
-          .insert(
-            selectedModalities.map(modality => ({
-              user_id: user.id,
-              modality,
-              status: 'active'
-            }))
-          );
+          .insert(modalitiesData);
 
         if (modalitiesError) throw modalitiesError;
       }
@@ -206,13 +230,13 @@ const Edit = () => {
           <div className="space-y-2">
             <label className="text-zinc-400">Modalidades:</label>
             <div className="flex gap-2 flex-wrap">
-              {['volei', 'futvolei', 'beach_tennis'].map(modality => (
+              {(['volei', 'futvolei', 'beach_tennis'] as const).map(modality => (
                 <button
                   key={modality}
                   type="button"
-                  onClick={() => handleModalityToggle(modality as Modality)}
+                  onClick={() => handleModalityToggle(modality)}
                   className={`px-4 py-2 rounded-full ${
-                    selectedModalities.includes(modality as Modality)
+                    selectedModalities.includes(modality)
                       ? 'bg-[#0EA5E9] text-white'
                       : 'bg-zinc-800 text-zinc-400'
                   }`}
