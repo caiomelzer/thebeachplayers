@@ -1,6 +1,10 @@
 
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface TeamMember {
   id: number;
@@ -12,10 +16,45 @@ interface TeamMember {
 
 const Complaint = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleWrongCategory = () => {
-    const message = encodeURIComponent("Olá, gostaria de reportar uma categoria incorreta no campeonato.");
-    window.open(`https://wa.me/5511980872469?text=${message}`, '_blank');
+  const handleWrongCategory = async () => {
+    if (!user) {
+      toast.error('Você precisa estar logado para fazer uma denúncia');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      // Save complaint to database
+      const { data: complaint, error } = await supabase
+        .from('complaints')
+        .insert({
+          team_id: '123', // Replace with actual team ID from context/params
+          reported_by_id: user.id,
+          message: 'Categoria incorreta no campeonato',
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Send WhatsApp message
+      const message = encodeURIComponent(
+        `Olá, gostaria de reportar uma categoria incorreta no campeonato.\nDenúncia ID: ${complaint.id}`
+      );
+      window.open(`https://wa.me/5511980872469?text=${message}`, '_blank');
+
+      toast.success('Denúncia enviada com sucesso!');
+    } catch (error) {
+      console.error('Error submitting complaint:', error);
+      toast.error('Erro ao enviar denúncia');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Mock data for the team members
@@ -39,7 +78,6 @@ const Complaint = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="relative">
-        {/* Back Button */}
         <button 
           onClick={() => navigate(-1)}
           className="absolute top-6 left-6 bg-[#0EA5E9] p-2 rounded-lg z-10"
@@ -47,9 +85,7 @@ const Complaint = () => {
           <ArrowLeft size={20} />
         </button>
 
-        {/* Championship Info */}
         <div className="pt-20 px-6 text-center">
-          {/* Championship Avatar - Now Clickable */}
           <button 
             onClick={() => navigate('/championship/123')} 
             className="inline-block mb-4"
@@ -61,15 +97,12 @@ const Complaint = () => {
             />
           </button>
 
-          {/* Championship Title */}
           <h1 className="text-2xl font-bold mb-2">R2 - Segunda Etapa</h1>
           
-          {/* Category */}
           <p className="text-[#0EA5E9] text-lg mb-8">
             Dupla Misto Intermediário
           </p>
 
-          {/* Team Members List */}
           <div className="space-y-4 mb-8">
             <h2 className="text-lg font-medium text-left">Integrantes</h2>
             {teamMembers.map((member) => (
@@ -93,12 +126,12 @@ const Complaint = () => {
             ))}
           </div>
 
-          {/* Action Button */}
           <button
             onClick={handleWrongCategory}
-            className="w-full bg-red-500 text-white py-3 px-6 rounded-lg font-medium"
+            disabled={isSubmitting}
+            className="w-full bg-red-500 text-white py-3 px-6 rounded-lg font-medium disabled:bg-gray-500"
           >
-            Alertar categoria incorreta
+            {isSubmitting ? 'Enviando...' : 'Alertar categoria incorreta'}
           </button>
         </div>
       </div>

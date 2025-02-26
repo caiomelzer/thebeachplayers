@@ -1,12 +1,110 @@
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Camera } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState, useRef } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Edit = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: user?.full_name || "",
+    nickname: user?.nickname || "",
+    born: user?.born || "",
+    gender: user?.gender || "",
+  });
+  const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
 
-  const handleLogout = () => {
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('No session');
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upload-avatar`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('Upload failed');
+
+      const { avatarUrl } = await response.json();
+      toast.success('Foto atualizada com sucesso!');
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error('Erro ao atualizar a foto');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleModalityToggle = (modality: string) => {
+    setSelectedModalities(prev => 
+      prev.includes(modality) 
+        ? prev.filter(m => m !== modality)
+        : [...prev, modality]
+    );
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      // Update user profile
+      const { error: profileError } = await supabase
+        .from('users')
+        .update(formData)
+        .eq('id', user?.id);
+
+      if (profileError) throw profileError;
+
+      // Update user modalities
+      const { error: modalitiesError } = await supabase
+        .from('user_modalities')
+        .upsert(
+          selectedModalities.map(modality => ({
+            user_id: user?.id,
+            modality,
+            status: 'active'
+          }))
+        );
+
+      if (modalitiesError) throw modalitiesError;
+
+      toast.success('Perfil atualizado com sucesso!');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Erro ao atualizar perfil');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -20,21 +118,38 @@ const Edit = () => {
         </button>
 
         <div className="flex flex-col items-center mb-6">
-          <img
-            src="/lovable-uploads/kleber.png"
-            alt="Profile"
-            className="w-24 h-24 rounded-full mb-4"
-          />
-          <h1 className="text-2xl font-bold">Kleber Utrilha</h1>
-          <p className="text-zinc-400">#123456</p>
+          <div className="relative">
+            <img
+              src={user?.avatar_url || "/lovable-uploads/kleber.png"}
+              alt="Profile"
+              className="w-24 h-24 rounded-full mb-4 cursor-pointer"
+              onClick={handleAvatarClick}
+            />
+            <button
+              className="absolute bottom-4 right-0 bg-[#0EA5E9] p-2 rounded-full"
+              onClick={handleAvatarClick}
+            >
+              <Camera size={16} />
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+          </div>
+          <h1 className="text-2xl font-bold">{user?.full_name || 'Nome do Usuário'}</h1>
+          <p className="text-zinc-400">{user?.id}</p>
         </div>
 
-        <form className="max-w-md mx-auto space-y-4">
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
           <div className="space-y-2">
             <label className="text-zinc-400">Nome completo:</label>
             <input
               type="text"
-              defaultValue="Kleber Utrilha"
+              value={formData.full_name}
+              onChange={e => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
               className="w-full p-3 rounded-lg bg-zinc-900 text-white"
             />
           </div>
@@ -43,16 +158,8 @@ const Edit = () => {
             <label className="text-zinc-400">Apelido:</label>
             <input
               type="text"
-              defaultValue="Klebinho"
-              className="w-full p-3 rounded-lg bg-zinc-900 text-white"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-zinc-400">CPF:</label>
-            <input
-              type="text"
-              defaultValue="123.456.789-00"
+              value={formData.nickname}
+              onChange={e => setFormData(prev => ({ ...prev, nickname: e.target.value }))}
               className="w-full p-3 rounded-lg bg-zinc-900 text-white"
             />
           </div>
@@ -61,52 +168,52 @@ const Edit = () => {
             <label className="text-zinc-400">Data de nascimento:</label>
             <input
               type="date"
-              defaultValue="1990-01-01"
+              value={formData.born}
+              onChange={e => setFormData(prev => ({ ...prev, born: e.target.value }))}
               className="w-full p-3 rounded-lg bg-zinc-900 text-white"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-zinc-400">Telefone:</label>
-            <input
-              type="tel"
-              defaultValue="(11) 99999-9999"
+            <label className="text-zinc-400">Gênero:</label>
+            <select
+              value={formData.gender}
+              onChange={e => setFormData(prev => ({ ...prev, gender: e.target.value }))}
               className="w-full p-3 rounded-lg bg-zinc-900 text-white"
-            />
+            >
+              <option value="">Selecione</option>
+              <option value="masculino">Masculino</option>
+              <option value="feminino">Feminino</option>
+              <option value="outro">Outro</option>
+            </select>
           </div>
 
           <div className="space-y-2">
-            <label className="text-zinc-400">Email:</label>
-            <input
-              type="email"
-              defaultValue="kleber123@teste.com.br"
-              className="w-full p-3 rounded-lg bg-zinc-900 text-white"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-zinc-400">Nova senha:</label>
-            <input
-              type="password"
-              placeholder="Digite a nova senha"
-              className="w-full p-3 rounded-lg bg-zinc-900 text-white"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-zinc-400">Confirmar nova senha:</label>
-            <input
-              type="password"
-              placeholder="Confirme a nova senha"
-              className="w-full p-3 rounded-lg bg-zinc-900 text-white"
-            />
+            <label className="text-zinc-400">Modalidades:</label>
+            <div className="flex gap-2 flex-wrap">
+              {['volei', 'futvolei', 'beach_tennis'].map(modality => (
+                <button
+                  key={modality}
+                  type="button"
+                  onClick={() => handleModalityToggle(modality)}
+                  className={`px-4 py-2 rounded-full ${
+                    selectedModalities.includes(modality)
+                      ? 'bg-[#0EA5E9] text-white'
+                      : 'bg-zinc-800 text-zinc-400'
+                  }`}
+                >
+                  {modality.replace('_', ' ')}
+                </button>
+              ))}
+            </div>
           </div>
 
           <button 
             type="submit"
+            disabled={isLoading}
             className="w-full bg-[#0EA5E9] text-white font-medium py-3 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors"
           >
-            Salvar
+            {isLoading ? 'Salvando...' : 'Salvar'}
           </button>
 
           <button 
