@@ -1,11 +1,12 @@
-
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -27,7 +28,6 @@ const Register = () => {
     const cleanCPF = cpf.replace(/[^\d]/g, '');
     if (cleanCPF.length !== 11) return false;
     
-    // CPF validation algorithm
     let sum = 0;
     for (let i = 0; i < 9; i++) {
       sum += parseInt(cleanCPF[i]) * (10 - i);
@@ -55,7 +55,6 @@ const Register = () => {
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Validate fields
     if (field === 'email') {
       setErrors(prev => ({
         ...prev,
@@ -82,10 +81,22 @@ const Register = () => {
            validatePassword(formData.password);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isFormValid()) {
-      // Handle registration logic here
+      try {
+        await signUp(formData.email, formData.password, formData.cpf);
+        toast.success("Cadastro realizado com sucesso!");
+        navigate('/login');
+      } catch (error: any) {
+        if (error.message === 'CPF já cadastrado') {
+          toast.error("CPF já cadastrado");
+        } else if (error.message.includes('Email already registered')) {
+          toast.error("Email já cadastrado");
+        } else {
+          toast.error("Erro ao realizar cadastro");
+        }
+      }
     }
   };
 

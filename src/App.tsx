@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -26,31 +28,36 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/championships" element={<Championships />} />
-          <Route path="/championship/:id" element={<Championship />} />
-          <Route path="/championship/:id/rules" element={<ChampionshipRules />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/players" element={<Players />} />
-          <Route path="/player/:id" element={<PlayerProfile />} />
-          <Route path="/complaint" element={<Complaint />} />
-          <Route path="/edit" element={<Edit />} />
-          <Route path="/arenas" element={<Arenas />} />
-          <Route path="/arena/:id" element={<ArenaDetails />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/terms" element={<Terms />} />
+            
+            {/* Protected routes */}
+            <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/championships" element={<ProtectedRoute><Championships /></ProtectedRoute>} />
+            <Route path="/championship/:id" element={<ProtectedRoute><Championship /></ProtectedRoute>} />
+            <Route path="/championship/:id/rules" element={<ProtectedRoute><ChampionshipRules /></ProtectedRoute>} />
+            <Route path="/players" element={<ProtectedRoute><Players /></ProtectedRoute>} />
+            <Route path="/player/:id" element={<ProtectedRoute><PlayerProfile /></ProtectedRoute>} />
+            <Route path="/complaint" element={<ProtectedRoute><Complaint /></ProtectedRoute>} />
+            <Route path="/edit" element={<ProtectedRoute><Edit /></ProtectedRoute>} />
+            <Route path="/arenas" element={<ProtectedRoute><Arenas /></ProtectedRoute>} />
+            <Route path="/arena/:id" element={<ProtectedRoute><ArenaDetails /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </TooltipProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 
