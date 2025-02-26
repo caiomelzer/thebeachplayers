@@ -20,25 +20,28 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormValid()) {
-      try {
-        setIsLoading(true);
-        const { data, error } = await signIn(formData.email, formData.password);
+    if (!isFormValid()) return;
 
-        if (error) throw error;
+    try {
+      setIsLoading(true);
+      const { data, error } = await signIn(formData.email, formData.password);
 
-        // Only show success and navigate if we have user data
-        if (data?.user) {
-          console.log(data.user);
-          toast.success("Login realizado com sucesso!");
-          navigate('/home', { replace: true });
-        }
-      } catch (error: any) {
-        console.error('Erro no login:', error);
-        toast.error("Email ou senha incorretos. Por favor, tente novamente.");
-      } finally {
-        setIsLoading(false);
+      if (error) throw error;
+
+      // Only show success and navigate if we have user data
+      if (data?.user) {
+        toast.success("Login realizado com sucesso!");
+        navigate('/home', { replace: true });
+        return; // Add early return after successful navigation
       }
+
+      // If we get here without user data, show an error
+      toast.error("Erro ao realizar login. Tente novamente.");
+    } catch (error: any) {
+      console.error('Erro no login:', error);
+      toast.error("Email ou senha incorretos. Por favor, tente novamente.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
