@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -76,18 +77,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const userData = await fetchUserData(session.user.id);
         setUser(userData);
+        if (event === 'SIGNED_IN') {
+          navigate('/home');
+        }
       } else {
         setUser(null);
+        if (event === 'SIGNED_OUT') {
+          navigate('/login');
+        }
+      }
+      setLoading(false);
+    });
+
+    // Check initial session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const userData = await fetchUserData(session.user.id);
+        setUser(userData);
       }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const signUp = async (email: string, password: string, document: string) => {
     try {
@@ -102,20 +118,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('CPF já cadastrado');
       }
 
-      // If CPF doesn't exist, proceed with signup
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            document, // This will be used by the trigger to set the CPF
+            document,
           },
         },
       });
 
       if (error) throw error;
-
-      console.log('Signup successful:', data);
       return { data, error: null };
     } catch (error) {
       console.error('Signup error:', error);
@@ -147,7 +160,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     setUser(null);
-    navigate('/');
   };
 
   return (
