@@ -1,4 +1,3 @@
-
 import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,8 +6,8 @@ const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Get the display name from user data or fall back to CPF
-  const displayName = user?.full_name || user?.nickname || user?.email || 'Usuário';
+  // Get the display name from user data, fallback to 'Usuário'
+  const displayName = user?.full_name || user?.nickname || 'Usuário';
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
@@ -46,7 +45,7 @@ const Home = () => {
       <div className="bg-zinc-900 rounded-xl p-4 mb-8">
         <div className="flex justify-between items-start mb-2">
           <span className="text-lg font-medium">Ranking Geral</span>
-          <span className="text-[#0EA5E9] text-xl font-bold">#00178</span>
+          <span className="text-[#0EA5E9] text-xl font-bold">#{user?.statistics?.ranking || '000'}</span>
         </div>
         <p className="text-sm text-zinc-400 mb-3">
           Esta é a sua colocação em um total de 23457 atletas.

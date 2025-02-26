@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import type { User } from '@/types/database';
+import type { User, PlayerStatistics } from '@/types/database';
 
 interface AuthContextType {
   user: User | null;
@@ -19,7 +19,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const fetchPlayerStatistics = async (userId: string) => {
+  const fetchPlayerStatistics = async (userId: string): Promise<PlayerStatistics | null> => {
     try {
       const { data, error } = await supabase
         .rpc('get_player_statistics', { player_id: userId });
@@ -29,14 +29,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null;
       }
 
-      return data;
+      // Cast the JSON response to our PlayerStatistics type
+      const stats: PlayerStatistics = {
+        ranking: data.ranking || 0,
+        victories: data.victories || 0,
+        defeats: data.defeats || 0,
+        totalChampionships: data.totalChampionships || 0,
+        recentChampionships: data.recentChampionships || 0
+      };
+
+      return stats;
     } catch (error) {
       console.error('Error in fetchPlayerStatistics:', error);
       return null;
     }
   };
 
-  const fetchUserData = async (userId: string) => {
+  const fetchUserData = async (userId: string): Promise<User | null> => {
     try {
       const { data: userData, error } = await supabase
         .from('users')
@@ -58,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return {
         ...userData,
         statistics: statistics || undefined
-      };
+      } as User; // Explicitly cast to User type
     } catch (error) {
       console.error('Error fetching user data:', error);
       return null;
