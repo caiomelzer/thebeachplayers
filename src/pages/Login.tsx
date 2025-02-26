@@ -19,12 +19,15 @@ const Login = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('Clicou')
     e.preventDefault();
     if (isFormValid()) {
+      console.log('valido')
       try {
+        console.log('Loading')
         setIsLoading(true);
         const { data, error } = await signIn(formData.email, formData.password);
-        
+        console.log('Retornou')
         if (error) throw error;
 
         // Only show success and navigate if we have user data
