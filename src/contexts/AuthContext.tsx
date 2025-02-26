@@ -9,6 +9,8 @@ interface Profile {
   full_name: string | null;
   nickname: string | null;
   avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 interface User {
@@ -47,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Fetch profile data
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, cpf, full_name, nickname, avatar_url, created_at, updated_at')
         .eq('id', userId)
         .single();
 
@@ -59,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return {
         ...userData,
         profile: profileData || undefined
-      };
+      } as User;
     } catch (error) {
       console.error('Error fetching user data:', error);
       return null;

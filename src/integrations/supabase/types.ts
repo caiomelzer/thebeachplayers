@@ -9,12 +9,43 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          cpf: string
+          created_at: string
+          full_name: string | null
+          id: string
+          nickname: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          cpf: string
+          created_at?: string
+          full_name?: string | null
+          id: string
+          nickname?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          cpf?: string
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          nickname?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           created_at: string
           document: string
           email: string
           id: string
+          name: string | null
           password: string
           updated_at: string
         }
@@ -23,6 +54,7 @@ export type Database = {
           document: string
           email: string
           id: string
+          name?: string | null
           password: string
           updated_at?: string
         }
@@ -31,6 +63,7 @@ export type Database = {
           document?: string
           email?: string
           id?: string
+          name?: string | null
           password?: string
           updated_at?: string
         }
