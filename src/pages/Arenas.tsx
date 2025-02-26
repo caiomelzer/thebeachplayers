@@ -2,12 +2,15 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Arena {
-  id: number;
+  id: string;
   name: string;
   address: string;
-  image: string;
+  main_image_url: string | null;
   distance?: number;
   coordinates: {
     latitude: number;
@@ -15,35 +18,38 @@ interface Arena {
   };
 }
 
+const fetchArenas = async () => {
+  const { data, error } = await supabase
+    .from('arenas')
+    .select('*')
+    .eq('status', 'active');
+
+  if (error) {
+    throw error;
+  }
+
+  return data.map(arena => ({
+    id: arena.id,
+    name: arena.name,
+    address: arena.address,
+    main_image_url: arena.main_image_url,
+    coordinates: {
+      latitude: arena.latitude,
+      longitude: arena.longitude
+    }
+  }));
+};
+
 const Arenas = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<'all' | 'near'>('all');
   const [searchTerm, setSearchTerm] = useState("");
   const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
 
-  // Mock data for arenas
-  const arenas: Arena[] = [
-    {
-      id: 1,
-      name: "Arena JR10",
-      address: "Rua Antônio Mariano, 137 - Jardim Ipanema, São Paulo",
-      image: "/lovable-uploads/logo.png",
-      coordinates: {
-        latitude: -23.6745,
-        longitude: -46.7014
-      }
-    },
-    {
-      id: 2,
-      name: "Arena Beach Sports",
-      address: "Av. José Galante, 730 - Vila Suzana, São Paulo",
-      image: "/lovable-uploads/logo-r2.png",
-      coordinates: {
-        latitude: -23.6245,
-        longitude: -46.7314
-      }
-    }
-  ];
+  const { data: arenas = [], isLoading, error } = useQuery({
+    queryKey: ['arenas'],
+    queryFn: fetchArenas
+  });
 
   useEffect(() => {
     if ('geolocation' in navigator) {
@@ -53,6 +59,7 @@ const Arenas = () => {
         },
         (error) => {
           console.error('Error getting location:', error);
+          toast.error("Não foi possível obter sua localização");
         }
       );
     }
@@ -105,6 +112,10 @@ const Arenas = () => {
 
   const filteredArenas = filterArenas();
 
+  if (error) {
+    toast.error("Erro ao carregar as arenas");
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="p-6">
@@ -151,6 +162,20 @@ const Arenas = () => {
           </button>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="text-center py-8 text-zinc-400">
+            Carregando arenas...
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && filteredArenas.length === 0 && (
+          <div className="text-center py-8 text-zinc-400">
+            Nenhuma arena encontrada
+          </div>
+        )}
+
         {/* Arenas List */}
         <div className="space-y-4">
           {filteredArenas.map((arena) => (
@@ -161,7 +186,7 @@ const Arenas = () => {
             >
               <div className="mr-4">
                 <img
-                  src={arena.image}
+                  src={arena.main_image_url || "/placeholder.svg"}
                   alt={arena.name}
                   className="w-16 h-16 rounded-lg object-cover"
                 />
