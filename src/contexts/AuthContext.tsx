@@ -29,16 +29,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null;
       }
 
-      // Cast the JSON response to our PlayerStatistics type
-      const stats: PlayerStatistics = {
-        ranking: data.ranking || 0,
-        victories: data.victories || 0,
-        defeats: data.defeats || 0,
-        totalChampionships: data.totalChampionships || 0,
-        recentChampionships: data.recentChampionships || 0
-      };
+      // Since data is of type Json, we need to safely access its properties
+      if (typeof data === 'object' && data !== null) {
+        return {
+          ranking: typeof data.ranking === 'number' ? data.ranking : 0,
+          victories: typeof data.victories === 'number' ? data.victories : 0,
+          defeats: typeof data.defeats === 'number' ? data.defeats : 0,
+          totalChampionships: typeof data.totalChampionships === 'number' ? data.totalChampionships : 0,
+          recentChampionships: typeof data.recentChampionships === 'number' ? data.recentChampionships : 0
+        };
+      }
 
-      return stats;
+      return null;
     } catch (error) {
       console.error('Error in fetchPlayerStatistics:', error);
       return null;
@@ -67,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return {
         ...userData,
         statistics: statistics || undefined
-      } as User; // Explicitly cast to User type
+      } as User;
     } catch (error) {
       console.error('Error fetching user data:', error);
       return null;
