@@ -8,7 +8,7 @@ const Home = () => {
   const { user } = useAuth();
 
   // Get the display name from user data or fall back to CPF
-  const displayName = user?.full_name || user?.nickname || user?.cpf || 'Usuário';
+  const displayName = user?.full_name || user?.nickname || user?.email || 'Usuário';
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
@@ -21,7 +21,7 @@ const Home = () => {
           </button>
           <button onClick={() => navigate('/edit')}>
             <img
-              src={user?.avatar_url || "/lovable-uploads/kleber.png"}
+              src={user?.avatar_url || "/lovable-uploads/avatar-app.png"}
               alt="Profile"
               className="w-8 h-8 rounded-full"
             />
