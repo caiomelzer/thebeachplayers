@@ -1,12 +1,15 @@
+
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 
 const Register = () => {
   const navigate = useNavigate();
   const { signUp } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -83,20 +86,27 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormValid()) {
-      try {
-        await signUp(formData.email, formData.password, formData.cpf);
-        toast.success("Cadastro realizado com sucesso!");
-        navigate('/login');
-      } catch (error: any) {
-        if (error.message === 'CPF já cadastrado') {
-          toast.error("CPF já cadastrado");
-        } else if (error.message.includes('Email already registered')) {
-          toast.error("Email já cadastrado");
-        } else {
-          toast.error("Erro ao realizar cadastro");
-        }
+    if (!isFormValid()) {
+      toast.error("Por favor, corrija os erros no formulário");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await signUp(formData.email, formData.password, formData.cpf);
+      toast.success("Cadastro realizado com sucesso! Verifique seu email para confirmar o cadastro.");
+      navigate('/login');
+    } catch (error: any) {
+      console.error('Erro no cadastro:', error);
+      if (error.message === 'CPF já cadastrado') {
+        toast.error("CPF já cadastrado");
+      } else if (error.message.includes('Email already registered')) {
+        toast.error("Email já cadastrado");
+      } else {
+        toast.error("Erro ao realizar cadastro. Por favor, tente novamente.");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,7 +122,7 @@ const Register = () => {
       <div className="flex-1 flex flex-col items-center mt-8">
         {/* Logo */}
         <div className="flex items-center justify-center mb-12">
-        <img 
+          <img 
             src="/lovable-uploads/logo-t.png" 
             alt="The BeachPlayers Logo" 
             className="w-92 h-24"
@@ -133,6 +143,7 @@ const Register = () => {
               onChange={(e) => handleInputChange('email', e.target.value)}
               className={`w-full p-3 rounded-lg bg-white text-black ${errors.email ? 'border-2 border-red-500' : ''}`}
               placeholder="Email"
+              disabled={isLoading}
             />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
@@ -146,6 +157,7 @@ const Register = () => {
               onChange={(e) => handleInputChange('cpf', e.target.value)}
               className={`w-full p-3 rounded-lg bg-white text-black ${errors.cpf ? 'border-2 border-red-500' : ''}`}
               placeholder="123.456.789-00"
+              disabled={isLoading}
             />
             {errors.cpf && <p className="text-red-500 text-sm">{errors.cpf}</p>}
           </div>
@@ -159,6 +171,7 @@ const Register = () => {
               onChange={(e) => handleInputChange('password', e.target.value)}
               className={`w-full p-3 rounded-lg bg-white text-black ${errors.password ? 'border-2 border-red-500' : ''}`}
               placeholder="********"
+              disabled={isLoading}
             />
             {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
@@ -168,22 +181,24 @@ const Register = () => {
             <p className="text-sm text-gray-400">
               Ao continuar, você aceita os{' '}
               <button 
+                type="button"
                 className="text-[#0EA5E9] hover:underline"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
+                onClick={() => navigate('/terms')}
               >
                 termos de uso
               </button>
             </p>
           </div>
 
-          <button 
+          <Button 
             type="submit"
-            disabled={!isFormValid()}
-            className={`w-full ${isFormValid() ? 'bg-[#0EA5E9]' : 'bg-gray-500'} text-white font-medium py-4 rounded-lg transition-colors mt-4`}
+            disabled={!isFormValid() || isLoading}
+            className={`w-full ${isFormValid() && !isLoading ? 'bg-[#0EA5E9]' : 'bg-gray-500'} text-white font-medium py-4 rounded-lg transition-colors mt-4`}
           >
-            Cadastrar
-          </button>
+            {isLoading ? 'Cadastrando...' : 'Cadastrar'}
+          </Button>
         </form>
       </div>
     </div>
