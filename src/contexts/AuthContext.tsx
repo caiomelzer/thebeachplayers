@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
-interface Profile {
+interface User {
   id: string;
   cpf: string;
   full_name: string | null;
@@ -11,13 +11,6 @@ interface Profile {
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
-}
-
-interface User {
-  id: string;
-  email: string;
-  document: string;
-  profile?: Profile;
 }
 
 interface AuthContextType {
@@ -37,31 +30,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserData = async (userId: string) => {
     try {
-      // Fetch user data from the users table
-      const { data: userData, error: userError } = await supabase
+      const { data: userData, error } = await supabase
         .from('users')
-        .select('id, email, document')
-        .eq('id', userId)
-        .single();
-
-      if (userError) throw userError;
-
-      // Fetch profile data
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
         .select('id, cpf, full_name, nickname, avatar_url, created_at, updated_at')
         .eq('id', userId)
         .single();
 
-      if (profileError && profileError.code !== 'PGRST116') {
-        // PGRST116 means no data found, which is ok - the profile might not exist yet
-        throw profileError;
+      if (error) {
+        if (error.code !== 'PGRST116') { // PGRST116 means no data found
+          throw error;
+        }
+        return null;
       }
 
-      return {
-        ...userData,
-        profile: profileData || undefined
-      } as User;
+      return userData;
     } catch (error) {
       console.error('Error fetching user data:', error);
       return null;
@@ -86,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: existingUser } = await supabase
       .from('users')
       .select('id')
-      .eq('document', document)
+      .eq('cpf', document)
       .single();
 
     if (existingUser) {
@@ -96,24 +78,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          document, // This will be used by the trigger to set the CPF
+        },
+      },
     });
 
     if (error) throw error;
-
-    if (data.user) {
-      const { error: userError } = await supabase
-        .from('users')
-        .insert([
-          {
-            id: data.user.id,
-            email,
-            document,
-            password: 'PROTECTED',
-          }
-        ]);
-
-      if (userError) throw userError;
-    }
 
     return data;
   };
