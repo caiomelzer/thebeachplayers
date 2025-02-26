@@ -3,8 +3,14 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
+interface User {
+  id: string;
+  email: string;
+  document: string;
+}
+
 interface AuthContextType {
-  user: any | null;
+  user: User | null;
   loading: boolean;
   signUp: (email: string, password: string, document: string) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
@@ -14,13 +20,23 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('id, email, document')
+          .eq('id', session.user.id)
+          .single();
+        
+        setUser(userData);
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
@@ -70,12 +86,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (error) throw error;
+
+    // Fetch user data after successful sign in
+    if (data.user) {
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id, email, document')
+        .eq('id', data.user.id)
+        .single();
+
+      if (userError) throw userError;
+      setUser(userData);
+    }
+
     return data;
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+    setUser(null);
     navigate('/');
   };
 
@@ -84,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
