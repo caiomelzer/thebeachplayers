@@ -9,6 +9,304 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      arenas: {
+        Row: {
+          address: string
+          created_at: string
+          email: string | null
+          id: string
+          instagram: string | null
+          latitude: number
+          longitude: number
+          main_image_url: string | null
+          name: string
+          status: Database["public"]["Enums"]["arena_status_type"]
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          latitude: number
+          longitude: number
+          main_image_url?: string | null
+          name: string
+          status?: Database["public"]["Enums"]["arena_status_type"]
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          latitude?: number
+          longitude?: number
+          main_image_url?: string | null
+          name?: string
+          status?: Database["public"]["Enums"]["arena_status_type"]
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          level: Database["public"]["Enums"]["level_type"]
+          modality: Database["public"]["Enums"]["modality_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level: Database["public"]["Enums"]["level_type"]
+          modality: Database["public"]["Enums"]["modality_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: Database["public"]["Enums"]["level_type"]
+          modality?: Database["public"]["Enums"]["modality_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      championships: {
+        Row: {
+          banner_url: string | null
+          category_id: string
+          created_at: string
+          gender: Database["public"]["Enums"]["gender_type"]
+          id: string
+          min_score: number
+          price: number
+          publication_date: string
+          registration_deadline: string
+          responsible_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          banner_url?: string | null
+          category_id: string
+          created_at?: string
+          gender: Database["public"]["Enums"]["gender_type"]
+          id?: string
+          min_score?: number
+          price: number
+          publication_date?: string
+          registration_deadline: string
+          responsible_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          banner_url?: string | null
+          category_id?: string
+          created_at?: string
+          gender?: Database["public"]["Enums"]["gender_type"]
+          id?: string
+          min_score?: number
+          price?: number
+          publication_date?: string
+          registration_deadline?: string
+          responsible_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "championships_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "championships_responsible_id_fkey"
+            columns: ["responsible_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      complaints: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          reported_by_id: string
+          status: Database["public"]["Enums"]["complaint_status_type"]
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          reported_by_id: string
+          status?: Database["public"]["Enums"]["complaint_status_type"]
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          reported_by_id?: string
+          status?: Database["public"]["Enums"]["complaint_status_type"]
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaints_reported_by_id_fkey"
+            columns: ["reported_by_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "complaints_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          championship_id: string
+          created_at: string
+          id: string
+          is_completed: boolean
+          match_date: string | null
+          team_a_id: string
+          team_a_score: number | null
+          team_b_id: string
+          team_b_score: number | null
+          updated_at: string
+        }
+        Insert: {
+          championship_id: string
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          match_date?: string | null
+          team_a_id: string
+          team_a_score?: number | null
+          team_b_id: string
+          team_b_score?: number | null
+          updated_at?: string
+        }
+        Update: {
+          championship_id?: string
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          match_date?: string | null
+          team_a_id?: string
+          team_a_score?: number | null
+          team_b_id?: string
+          team_b_score?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_championship_id_fkey"
+            columns: ["championship_id"]
+            isOneToOne: false
+            referencedRelation: "championships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_team_a_id_fkey"
+            columns: ["team_a_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_team_b_id_fkey"
+            columns: ["team_b_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          id: string
+          joined_at: string
+          team_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          joined_at?: string
+          team_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          joined_at?: string
+          team_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           avatar_url: string | null
@@ -53,7 +351,22 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      arena_status_type: "active" | "inactive" | "maintenance"
+      complaint_status_type:
+        | "pending"
+        | "under_review"
+        | "resolved"
+        | "dismissed"
+      gender_type: "masculino" | "feminino" | "misto"
+      level_type:
+        | "estreante"
+        | "iniciante"
+        | "intermediario"
+        | "intermediario_plus"
+        | "avancado"
+        | "open"
+        | "master"
+      modality_type: "volei" | "beach_tennis" | "futvolei"
     }
     CompositeTypes: {
       [_ in never]: never
