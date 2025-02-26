@@ -34,7 +34,7 @@ const Players = () => {
       name: "Ronaldinho Gaúcho",
       category: "Iniciante",
       avatar: "/lovable-uploads/ronaldinho.png",
-      sport: "futvolei"
+      sport: "volei"
     },
     {
       id: 3,
@@ -42,7 +42,7 @@ const Players = () => {
       name: "Maria Silva",
       category: "Avançado",
       avatar: "/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png",
-      sport: "beachtennis"
+      sport: "volei"
     }
   ];
 
