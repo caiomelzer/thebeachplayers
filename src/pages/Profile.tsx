@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import type { UserModality } from "@/types/database";
 
 interface UserStats {
   ranking: number;
@@ -28,15 +29,16 @@ const Profile = () => {
       if (!user) return;
 
       try {
-        // Fetch user's active modalities
-        const { data: modalities } = await supabase
+        const { data: modalities, error } = await supabase
           .from('user_modalities')
-          .select('modality')
+          .select('*')
           .eq('user_id', user.id)
           .eq('status', 'active');
 
+        if (error) throw error;
+
         if (modalities) {
-          setActiveModalities(modalities.map(m => m.modality));
+          setActiveModalities(modalities.map((m: UserModality) => m.modality));
         }
 
         // TODO: Implement the queries to fetch actual stats

@@ -5,6 +5,9 @@ import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { UserModality } from "@/types/database";
+
+type Modality = UserModality['modality'];
 
 const Edit = () => {
   const navigate = useNavigate();
@@ -17,7 +20,7 @@ const Edit = () => {
     born: user?.born || "",
     gender: user?.gender || "",
   });
-  const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
+  const [selectedModalities, setSelectedModalities] = useState<Modality[]>([]);
 
   const handleLogout = async () => {
     try {
@@ -64,7 +67,7 @@ const Edit = () => {
     }
   };
 
-  const handleModalityToggle = (modality: string) => {
+  const handleModalityToggle = (modality: Modality) => {
     setSelectedModalities(prev => 
       prev.includes(modality) 
         ? prev.filter(m => m !== modality)
@@ -77,26 +80,38 @@ const Edit = () => {
     setIsLoading(true);
 
     try {
+      if (!user?.id) throw new Error('No user ID');
+
       // Update user profile
       const { error: profileError } = await supabase
         .from('users')
         .update(formData)
-        .eq('id', user?.id);
+        .eq('id', user.id);
 
       if (profileError) throw profileError;
 
-      // Update user modalities
-      const { error: modalitiesError } = await supabase
+      // Delete existing modalities
+      const { error: deleteError } = await supabase
         .from('user_modalities')
-        .upsert(
-          selectedModalities.map(modality => ({
-            user_id: user?.id,
-            modality,
-            status: 'active'
-          }))
-        );
+        .delete()
+        .eq('user_id', user.id);
 
-      if (modalitiesError) throw modalitiesError;
+      if (deleteError) throw deleteError;
+
+      // Insert new modalities
+      if (selectedModalities.length > 0) {
+        const { error: modalitiesError } = await supabase
+          .from('user_modalities')
+          .insert(
+            selectedModalities.map(modality => ({
+              user_id: user.id,
+              modality,
+              status: 'active'
+            }))
+          );
+
+        if (modalitiesError) throw modalitiesError;
+      }
 
       toast.success('Perfil atualizado com sucesso!');
     } catch (error) {
@@ -195,9 +210,9 @@ const Edit = () => {
                 <button
                   key={modality}
                   type="button"
-                  onClick={() => handleModalityToggle(modality)}
+                  onClick={() => handleModalityToggle(modality as Modality)}
                   className={`px-4 py-2 rounded-full ${
-                    selectedModalities.includes(modality)
+                    selectedModalities.includes(modality as Modality)
                       ? 'bg-[#0EA5E9] text-white'
                       : 'bg-zinc-800 text-zinc-400'
                   }`}
@@ -211,7 +226,7 @@ const Edit = () => {
           <button 
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#0EA5E9] text-white font-medium py-3 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors"
+            className="w-full bg-[#0EA5E9] text-white font-medium py-3 rounded-lg hover:bg-[#0EA5E9]/90 transition-colors disabled:opacity-50"
           >
             {isLoading ? 'Salvando...' : 'Salvar'}
           </button>

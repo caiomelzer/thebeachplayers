@@ -307,6 +307,41 @@ export type Database = {
         }
         Relationships: []
       }
+      user_modalities: {
+        Row: {
+          created_at: string
+          id: string
+          modality: Database["public"]["Enums"]["modality_type"]
+          status: Database["public"]["Enums"]["user_modality_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          modality: Database["public"]["Enums"]["modality_type"]
+          status?: Database["public"]["Enums"]["user_modality_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          modality?: Database["public"]["Enums"]["modality_type"]
+          status?: Database["public"]["Enums"]["user_modality_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_modalities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           avatar_url: string | null
@@ -367,6 +402,7 @@ export type Database = {
         | "open"
         | "master"
       modality_type: "volei" | "beach_tennis" | "futvolei"
+      user_modality_status: "active" | "inactive"
     }
     CompositeTypes: {
       [_ in never]: never
