@@ -2,16 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-
-interface User {
-  id: string;
-  cpf: string;
-  full_name: string | null;
-  nickname: string | null;
-  avatar_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import type { User } from '@/types/database';
 
 interface AuthContextType {
   user: User | null;
@@ -32,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { data: userData, error } = await supabase
         .from('users')
-        .select('id, cpf, full_name, nickname, avatar_url, created_at, updated_at')
+        .select('id, cpf, full_name, nickname, avatar_url, born, gender, created_at, updated_at')
         .eq('id', userId)
         .single();
 
