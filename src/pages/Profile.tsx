@@ -68,14 +68,12 @@ const Profile = () => {
               <div className="bg-zinc-900 rounded-lg p-4">
                 <h2 className="text-lg mb-4">Vitórias</h2>
                 <p className="text-4xl font-bold">19</p>
-                <p className="text-sm text-zinc-400">Vitórias</p>
               </div>
 
               {/* Defeats Card */}
               <div className="bg-zinc-900 rounded-lg p-4">
                 <h2 className="text-lg mb-4">Derrotas</h2>
                 <p className="text-4xl font-bold">32</p>
-                <p className="text-sm text-zinc-400">Derrotas</p>
               </div>
             </div>
           </div>
