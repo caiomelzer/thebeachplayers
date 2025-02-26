@@ -19,6 +19,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const fetchPlayerStatistics = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_player_statistics', { player_id: userId });
+
+      if (error) {
+        console.error('Error fetching player statistics:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in fetchPlayerStatistics:', error);
+      return null;
+    }
+  };
+
   const fetchUserData = async (userId: string) => {
     try {
       const { data: userData, error } = await supabase
@@ -34,7 +51,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null;
       }
 
-      return userData;
+      // Fetch player statistics
+      const statistics = await fetchPlayerStatistics(userId);
+      
+      // Combine user data with statistics
+      return {
+        ...userData,
+        statistics: statistics || undefined
+      };
     } catch (error) {
       console.error('Error fetching user data:', error);
       return null;

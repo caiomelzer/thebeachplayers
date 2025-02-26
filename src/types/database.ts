@@ -8,6 +8,14 @@ export type UserModality = {
   updated_at: string;
 }
 
+export type PlayerStatistics = {
+  ranking: number;
+  victories: number;
+  defeats: number;
+  totalChampionships: number;
+  recentChampionships: number;
+}
+
 export type User = {
   id: string;
   full_name: string | null;
@@ -18,4 +26,5 @@ export type User = {
   cpf: string;
   created_at: string;
   updated_at: string;
+  statistics?: PlayerStatistics;
 }
