@@ -7,8 +7,8 @@ const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Get the display name from profile or fall back to email
-  const displayName = user?.profile?.full_name || user?.profile?.nickname || user?.email?.split('@')[0] || 'Usuário';
+  // Get the display name from user data or fall back to CPF
+  const displayName = user?.full_name || user?.nickname || user?.cpf || 'Usuário';
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
@@ -21,7 +21,7 @@ const Home = () => {
           </button>
           <button onClick={() => navigate('/edit')}>
             <img
-              src={user?.profile?.avatar_url || "/lovable-uploads/kleber.png"}
+              src={user?.avatar_url || "/lovable-uploads/kleber.png"}
               alt="Profile"
               className="w-8 h-8 rounded-full"
             />
