@@ -383,12 +383,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_player_statistics: {
-        Args: {
-          player_id: string
-        }
-        Returns: Json
-      }
+      [_ in never]: never
     }
     Enums: {
       arena_status_type: "active" | "inactive" | "maintenance"
