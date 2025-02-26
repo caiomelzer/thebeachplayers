@@ -12,27 +12,33 @@ export type Database = {
       users: {
         Row: {
           avatar_url: string | null
+          born: string | null
           cpf: string
           created_at: string
           full_name: string | null
+          gender: string | null
           id: string
           nickname: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
+          born?: string | null
           cpf: string
           created_at?: string
           full_name?: string | null
+          gender?: string | null
           id: string
           nickname?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
+          born?: string | null
           cpf?: string
           created_at?: string
           full_name?: string | null
+          gender?: string | null
           id?: string
           nickname?: string | null
           updated_at?: string
