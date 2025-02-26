@@ -1,3 +1,4 @@
+
 import { Search, Book, FileText, CheckSquare, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -111,19 +112,22 @@ const Home = () => {
             </div>
           </button>
 
-          {/* Convites Para jogar - now inactive */}
-          <div className="bg-zinc-900/50 p-4 rounded-xl text-left opacity-50 cursor-not-allowed">
-            <div className="bg-green-900/50 p-2 rounded-lg w-fit mb-2">
-              <Users className="w-5 h-5 text-white/50" />
+          {/* Jogadores Card */}
+          <button 
+            onClick={() => navigate('/players')}
+            className="bg-zinc-900 p-4 rounded-xl text-left"
+          >
+            <div className="bg-green-900 p-2 rounded-lg w-fit mb-2">
+              <Users className="w-5 h-5 text-white" />
             </div>
             <div className="flex justify-between items-end">
               <div>
-                <p className="text-sm text-zinc-400">Convites</p>
-                <p className="font-medium text-zinc-400">Para jogar</p>
+                <p className="text-sm text-zinc-400">Jogadores</p>
+                <p className="font-medium">Vôlei</p>
               </div>
-              <span className="text-green-500/50 text-2xl font-bold">3</span>
+              <span className="text-green-500 text-2xl font-bold">324</span>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </div>
