@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -75,66 +76,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Initialize auth state
   useEffect(() => {
-    // Set initial loading state
-    setLoading(true);
-
-    // Check initial session
-    const initializeAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.user) {
-          const userData = await fetchUserData(session.user.id);
-          setUser(userData);
-          // Only navigate to home if we're on the login page
-          if (window.location.pathname === '/login') {
-            navigate('/home', { replace: true });
-          }
-        } else {
-          setUser(null);
-          // Only navigate to login if we're not on a public route
-          const publicRoutes = ['/', '/login', '/register', '/forgot-password'];
-          if (!publicRoutes.includes(window.location.pathname)) {
-            navigate('/login', { replace: true });
-          }
-        }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeAuth();
-
-    // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      try {
-        if (event === 'SIGNED_IN' && session?.user) {
-          const userData = await fetchUserData(session.user.id);
-          setUser(userData);
-          navigate('/home', { replace: true });
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-          navigate('/login', { replace: true });
+      if (session?.user) {
+        const userData = await fetchUserData(session.user.id);
+        setUser(userData);
+        if (event === 'SIGNED_IN') {
+          navigate('/home');
         }
-      } catch (error) {
-        console.error('Error handling auth state change:', error);
+      } else {
         setUser(null);
+        if (event === 'SIGNED_OUT') {
+          navigate('/login');
+        }
       }
+      setLoading(false);
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    // Check initial session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const userData = await fetchUserData(session.user.id);
+        setUser(userData);
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const signUp = async (email: string, password: string, document: string) => {
     try {
-      setLoading(true);
       // First, check if CPF already exists
       const { data: existingUser } = await supabase
         .from('users')
@@ -161,14 +133,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Signup error:', error);
       return { data: null, error };
-    } finally {
-      setLoading(false);
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -179,31 +148,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.user) {
         const userData = await fetchUserData(data.user.id);
         setUser(userData);
-        navigate('/home', { replace: true });
       }
 
       return { data, error: null };
     } catch (error) {
-      console.error('Sign in error:', error);
       return { data: null, error };
-    } finally {
-      setLoading(false);
     }
   };
 
   const signOut = async () => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      setUser(null);
-      navigate('/login', { replace: true });
-    } catch (error) {
-      console.error('Sign out error:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    setUser(null);
   };
 
   return (
