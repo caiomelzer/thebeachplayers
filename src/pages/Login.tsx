@@ -23,9 +23,15 @@ const Login = () => {
     if (isFormValid()) {
       try {
         setIsLoading(true);
-        await signIn(formData.email, formData.password);
-        toast.success("Login realizado com sucesso!");
-        navigate('/home');
+        const { data, error } = await signIn(formData.email, formData.password);
+        
+        if (error) throw error;
+
+        // Only show success and navigate if we have user data
+        if (data?.user) {
+          toast.success("Login realizado com sucesso!");
+          navigate('/home', { replace: true });
+        }
       } catch (error: any) {
         console.error('Erro no login:', error);
         toast.error("Email ou senha incorretos. Por favor, tente novamente.");
