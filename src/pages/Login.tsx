@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const Login = () => {
   const navigate = useNavigate();
   const { signIn } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -21,18 +22,21 @@ const Login = () => {
     e.preventDefault();
     if (isFormValid()) {
       try {
+        setIsLoading(true);
         await signIn(formData.email, formData.password);
         toast.success("Login realizado com sucesso!");
         navigate('/home');
       } catch (error: any) {
-        toast.error("Email ou senha incorretos");
+        console.error('Erro no login:', error);
+        toast.error("Email ou senha incorretos. Por favor, tente novamente.");
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col p-6 bg-black">
-      {/* Back Button */}
       <button 
         onClick={() => navigate("/")}
         className="text-white p-2 rounded-lg bg-[#0EA5E9] w-fit"
@@ -41,19 +45,16 @@ const Login = () => {
       </button>
 
       <div className="flex-1 flex flex-col items-center mt-8">
-        {/* Logo */}
         <div className="flex items-center justify-center mb-12">
-        <img 
+          <img 
             src="/lovable-uploads/logo-t.png" 
             alt="The BeachPlayers Logo" 
             className="w-92 h-24"
           />
         </div>
 
-        {/* Welcome Text */}
         <p className="text-white text-lg mb-8">Seja bem-vindo novamente...</p>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
           <div className="space-y-2">
             <label htmlFor="email" className="text-white">Email:</label>
@@ -64,6 +65,7 @@ const Login = () => {
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full p-3 rounded-lg bg-white text-black"
               placeholder="Email"
+              disabled={isLoading}
             />
           </div>
 
@@ -76,6 +78,7 @@ const Login = () => {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               className="w-full p-3 rounded-lg bg-white text-black"
               placeholder="********"
+              disabled={isLoading}
             />
           </div>
 
@@ -91,10 +94,10 @@ const Login = () => {
 
           <button 
             type="submit"
-            disabled={!isFormValid()}
-            className={`w-full ${isFormValid() ? 'bg-[#0EA5E9]' : 'bg-gray-500'} text-white font-medium py-4 rounded-lg transition-colors`}
+            disabled={!isFormValid() || isLoading}
+            className={`w-full ${isFormValid() && !isLoading ? 'bg-[#0EA5E9]' : 'bg-gray-500'} text-white font-medium py-4 rounded-lg transition-colors`}
           >
-            Entrar
+            {isLoading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
       </div>

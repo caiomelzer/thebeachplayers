@@ -1,8 +1,11 @@
+
 import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
@@ -26,7 +29,7 @@ const Home = () => {
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-1">Olá</h1>
-        <h2 className="text-4xl font-bold mb-4">Kleber</h2>
+        <h2 className="text-4xl font-bold mb-4">{user?.email?.split('@')[0] || 'Usuário'}</h2>
         
         {/* Sport Tags */}
         <div className="flex gap-4 text-sm">
