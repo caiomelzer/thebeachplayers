@@ -29,6 +29,7 @@ const Login = () => {
 
         // Only show success and navigate if we have user data
         if (data?.user) {
+          console.log(data.user);
           toast.success("Login realizado com sucesso!");
           navigate('/home', { replace: true });
         }
