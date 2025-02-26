@@ -12,8 +12,8 @@ export type PlayerStatistics = {
   ranking: number;
   victories: number;
   defeats: number;
-  totalChampionships: number;
-  recentChampionships: number;
+  total_championships: number;
+  recent_championships: number;
 }
 
 export type User = {
@@ -28,3 +28,4 @@ export type User = {
   updated_at: string;
   statistics?: PlayerStatistics;
 }
+

@@ -21,20 +21,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserData = async (userId: string): Promise<User | null> => {
     try {
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('id, cpf, full_name, nickname, avatar_url, born, gender, created_at, updated_at')
-        .eq('id', userId)
-        .single();
+      // Buscar dados do usuário e estatísticas em paralelo
+      const [userResponse, statsResponse] = await Promise.all([
+        supabase
+          .from('users')
+          .select('id, cpf, full_name, nickname, avatar_url, born, gender, created_at, updated_at')
+          .eq('id', userId)
+          .single(),
+        supabase
+          .from('user_statistics')
+          .select('ranking, victories, defeats, total_championships, recent_championships')
+          .eq('user_id', userId)
+          .single()
+      ]);
 
-      if (error) {
-        if (error.code !== 'PGRST116') { // PGRST116 means no data found
-          throw error;
-        }
+      if (userResponse.error && userResponse.error.code !== 'PGRST116') {
+        throw userResponse.error;
+      }
+
+      if (!userResponse.data) {
         return null;
       }
 
-      return userData as User;
+      // Combinar dados do usuário com estatísticas
+      return {
+        ...userResponse.data,
+        statistics: statsResponse.data || {
+          ranking: 0,
+          victories: 0,
+          defeats: 0,
+          total_championships: 0,
+          recent_championships: 0
+        }
+      } as User;
     } catch (error) {
       console.error('Error fetching user data:', error);
       return null;

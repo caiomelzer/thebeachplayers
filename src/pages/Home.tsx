@@ -1,3 +1,4 @@
+
 import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,6 +9,15 @@ const Home = () => {
 
   // Get the display name from user data, fallback to 'Usuário'
   const displayName = user?.full_name || user?.nickname || 'Usuário';
+
+  // Get user statistics with default values
+  const stats = user?.statistics || {
+    ranking: 0,
+    victories: 0,
+    defeats: 0,
+    total_championships: 0,
+    recent_championships: 0
+  };
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
@@ -45,7 +55,7 @@ const Home = () => {
       <div className="bg-zinc-900 rounded-xl p-4 mb-8">
         <div className="flex justify-between items-start mb-2">
           <span className="text-lg font-medium">Ranking Geral</span>
-          <span className="text-[#0EA5E9] text-xl font-bold">#{user?.statistics?.ranking || '000'}</span>
+          <span className="text-[#0EA5E9] text-xl font-bold">#{stats.ranking.toString().padStart(5, '0')}</span>
         </div>
         <p className="text-sm text-zinc-400 mb-3">
           Esta é a sua colocação em um total de 23457 atletas.
@@ -82,7 +92,7 @@ const Home = () => {
             </div>
           </button>
 
-          {/* Campeonatos Inscritos */}
+          {/* Victories Card */}
           <button 
             onClick={() => navigate('/championships', { state: { initialFilter: 'registered' } })}
             className="bg-zinc-900 p-4 rounded-xl text-left"
@@ -92,14 +102,14 @@ const Home = () => {
             </div>
             <div className="flex justify-between items-end">
               <div>
-                <p className="text-sm text-zinc-400">Campeonatos</p>
-                <p className="font-medium">Inscritos</p>
+                <p className="text-sm text-zinc-400">Vitórias</p>
+                <p className="font-medium">Totais</p>
               </div>
-              <span className="text-orange-500 text-2xl font-bold">4</span>
+              <span className="text-orange-500 text-2xl font-bold">{stats.victories}</span>
             </div>
           </button>
 
-          {/* Campeonatos Em breve */}
+          {/* Recent Championships Card */}
           <button 
             onClick={() => navigate('/championships', { state: { initialFilter: 'soon' } })}
             className="bg-zinc-900 p-4 rounded-xl text-left"
@@ -110,9 +120,9 @@ const Home = () => {
             <div className="flex justify-between items-end">
               <div>
                 <p className="text-sm text-zinc-400">Campeonatos</p>
-                <p className="font-medium">Em breve</p>
+                <p className="font-medium">Recentes</p>
               </div>
-              <span className="text-purple-500 text-2xl font-bold">15</span>
+              <span className="text-purple-500 text-2xl font-bold">{stats.recent_championships}</span>
             </div>
           </button>
 
