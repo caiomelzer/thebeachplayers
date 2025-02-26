@@ -22,17 +22,17 @@ const Complaint = () => {
   const teamMembers: TeamMember[] = [
     {
       id: 1,
-      nickname: "KleberU",
+      nickname: "Klebinho",
       name: "Kleber Utrilha",
       level: "Intermediário",
-      avatar: "/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
+      avatar: "/lovable-uploads/kleber.png"
     },
     {
       id: 2,
-      nickname: "RonaldoG",
+      nickname: "Bruxo",
       name: "Ronaldinho Gaúcho",
       level: "Avançado",
-      avatar: "/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
+      avatar: "/lovable-uploads/ronaldinho.png"
     }
   ];
 

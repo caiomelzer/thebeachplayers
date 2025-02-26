@@ -11,7 +11,7 @@ const PlayerProfile = () => {
     nickname: "KleberU",
     name: "Kleber Utrilha",
     playerId: "#123456",
-    avatar: "/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png",
+    avatar: "/lovable-uploads/kleber.png",
     sports: ["Vôlei", "FutVôlei", "Beach Tennis"],
     ranking: "#00178",
     rankingChange: "Subiu 36 posições no último mês",

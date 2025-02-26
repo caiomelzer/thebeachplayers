@@ -108,12 +108,12 @@ const Championship = () => {
                 <div className="flex items-center gap-2">
                   <div className="flex -space-x-2">
                     <img
-                      src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
+                      src="/lovable-uploads/kleber.png"
                       alt="Player 1"
                       className="w-8 h-8 rounded-full border-2 border-black"
                     />
                     <img
-                      src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
+                      src="/lovable-uploads/ronaldinho.png"
                       alt="Player 2"
                       className="w-8 h-8 rounded-full border-2 border-black"
                     />

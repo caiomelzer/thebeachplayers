@@ -17,7 +17,7 @@ const Profile = () => {
 
         <div className="flex flex-col items-center">
           <img
-            src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
+            src="/lovable-uploads/kleber.png"
             alt="Profile"
             className="w-24 h-24 rounded-full mb-4"
           />

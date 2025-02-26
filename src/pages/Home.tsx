@@ -16,7 +16,7 @@ const Home = () => {
           </button>
           <button onClick={() => navigate('/edit')}>
             <img
-              src="/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png"
+              src="/lovable-uploads/kleber.png"
               alt="Profile"
               className="w-8 h-8 rounded-full"
             />
