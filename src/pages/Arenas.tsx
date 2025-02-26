@@ -11,11 +11,14 @@ interface Arena {
   name: string;
   address: string;
   main_image_url: string | null;
-  distance?: number;
   coordinates: {
     latitude: number;
     longitude: number;
   };
+}
+
+interface ArenaWithDistance extends Arena {
+  distance: number;
 }
 
 const fetchArenas = async () => {
@@ -65,7 +68,7 @@ const Arenas = () => {
     }
   }, []);
 
-  const calculateDistance = (arena: Arena) => {
+  const calculateDistance = (arena: Arena): number => {
     if (!userLocation) return Infinity;
 
     const R = 6371; // Earth's radius in km
@@ -78,13 +81,11 @@ const Arenas = () => {
              Math.cos(lat1) * Math.cos(lat2) *
              Math.sin(deltaLon/2) * Math.sin(deltaLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const distance = R * c;
-
-    return distance;
+    return R * c;
   };
 
   const filterArenas = () => {
-    let filtered = arenas;
+    let filtered = [...arenas];
 
     // Apply search filter
     if (searchTerm) {
@@ -95,19 +96,19 @@ const Arenas = () => {
     }
 
     // Calculate distances and sort if needed
-    filtered = filtered.map(arena => ({
+    const arenasWithDistance: ArenaWithDistance[] = filtered.map(arena => ({
       ...arena,
       distance: calculateDistance(arena)
     }));
 
     // Apply distance filter
     if (activeFilter === 'near') {
-      filtered = filtered
-        .filter(arena => arena.distance !== undefined && arena.distance < 10) // Show arenas within 10km
-        .sort((a, b) => (a.distance || 0) - (b.distance || 0));
+      return arenasWithDistance
+        .filter(arena => arena.distance < 10) // Show arenas within 10km
+        .sort((a, b) => a.distance - b.distance);
     }
 
-    return filtered;
+    return arenasWithDistance;
   };
 
   const filteredArenas = filterArenas();
@@ -194,7 +195,7 @@ const Arenas = () => {
               <div className="flex-1">
                 <h3 className="font-medium">{arena.name}</h3>
                 <p className="text-sm text-zinc-400">{arena.address}</p>
-                {arena.distance !== undefined && activeFilter === 'near' && (
+                {activeFilter === 'near' && (
                   <p className="text-sm text-[#0EA5E9]">
                     {arena.distance.toFixed(1)}km de distância
                   </p>

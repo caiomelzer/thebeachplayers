@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -29,14 +28,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null;
       }
 
-      // Since data is of type Json, we need to safely access its properties
-      if (typeof data === 'object' && data !== null) {
+      if (data && typeof data === 'object') {
+        const stats = data as Record<string, number>;
         return {
-          ranking: typeof data.ranking === 'number' ? data.ranking : 0,
-          victories: typeof data.victories === 'number' ? data.victories : 0,
-          defeats: typeof data.defeats === 'number' ? data.defeats : 0,
-          totalChampionships: typeof data.totalChampionships === 'number' ? data.totalChampionships : 0,
-          recentChampionships: typeof data.recentChampionships === 'number' ? data.recentChampionships : 0
+          ranking: stats.ranking || 0,
+          victories: stats.victories || 0,
+          defeats: stats.defeats || 0,
+          totalChampionships: stats.totalChampionships || 0,
+          recentChampionships: stats.recentChampionships || 0
         };
       }
 
