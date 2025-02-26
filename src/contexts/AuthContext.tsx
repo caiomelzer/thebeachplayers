@@ -65,45 +65,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signUp = async (email: string, password: string, document: string) => {
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('cpf', document)
-      .single();
+    try {
+      // First, check if CPF already exists
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('cpf', document)
+        .single();
 
-    if (existingUser) {
-      throw new Error('CPF já cadastrado');
-    }
+      if (existingUser) {
+        throw new Error('CPF já cadastrado');
+      }
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          document, // This will be used by the trigger to set the CPF
+      // If CPF doesn't exist, proceed with signup
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            document, // This will be used by the trigger to set the CPF
+          },
         },
-      },
-    });
+      });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    return data;
+      console.log('Signup successful:', data);
+      return { data, error: null };
+    } catch (error) {
+      console.error('Signup error:', error);
+      return { data: null, error };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    if (data.user) {
-      const userData = await fetchUserData(data.user.id);
-      setUser(userData);
+      if (data.user) {
+        const userData = await fetchUserData(data.user.id);
+        setUser(userData);
+      }
+
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error };
     }
-
-    return data;
   };
 
   const signOut = async () => {
