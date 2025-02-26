@@ -19,6 +19,8 @@ import Edit from "./pages/Edit";
 import NotFound from "./pages/NotFound";
 import Players from "./pages/Players";
 import PlayerProfile from "./pages/PlayerProfile";
+import Arenas from "./pages/Arenas";
+import ArenaDetails from "./pages/ArenaDetails";
 
 const queryClient = new QueryClient();
 
@@ -43,7 +45,8 @@ const App = () => (
           <Route path="/player/:id" element={<PlayerProfile />} />
           <Route path="/complaint" element={<Complaint />} />
           <Route path="/edit" element={<Edit />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/arenas" element={<Arenas />} />
+          <Route path="/arena/:id" element={<ArenaDetails />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
