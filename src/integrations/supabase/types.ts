@@ -342,6 +342,39 @@ export type Database = {
           },
         ]
       }
+      user_statistics: {
+        Row: {
+          created_at: string
+          defeats: number
+          ranking: number
+          recent_championships: number
+          total_championships: number
+          updated_at: string
+          user_id: string
+          victories: number
+        }
+        Insert: {
+          created_at?: string
+          defeats?: number
+          ranking?: number
+          recent_championships?: number
+          total_championships?: number
+          updated_at?: string
+          user_id: string
+          victories?: number
+        }
+        Update: {
+          created_at?: string
+          defeats?: number
+          ranking?: number
+          recent_championships?: number
+          total_championships?: number
+          updated_at?: string
+          user_id?: string
+          victories?: number
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           avatar_url: string | null

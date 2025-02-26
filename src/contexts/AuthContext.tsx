@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import type { User} from '@/types/database';
+import type { User, PlayerStatistics } from '@/types/database';
 
 interface AuthContextType {
   user: User | null;
@@ -21,39 +21,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserData = async (userId: string): Promise<User | null> => {
     try {
-      // Buscar dados do usuário e estatísticas em paralelo
-      const [userResponse, statsResponse] = await Promise.all([
-        supabase
-          .from('users')
-          .select('id, cpf, full_name, nickname, avatar_url, born, gender, created_at, updated_at')
-          .eq('id', userId)
-          .single(),
-        supabase
-          .from('user_statistics')
-          .select('ranking, victories, defeats, total_championships, recent_championships')
-          .eq('user_id', userId)
-          .single()
-      ]);
+      // Get user data
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-      if (userResponse.error && userResponse.error.code !== 'PGRST116') {
-        throw userResponse.error;
+      if (userError) {
+        throw userError;
       }
 
-      if (!userResponse.data) {
+      if (!userData) {
         return null;
       }
 
-      // Combinar dados do usuário com estatísticas
-      return {
-        ...userResponse.data,
-        statistics: statsResponse.data || {
+      // Get user statistics
+      const { data: statsData } = await supabase
+        .from('user_statistics')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      // Combine user data with statistics
+      const userWithStats: User = {
+        ...userData,
+        statistics: statsData || {
+          user_id: userId,
           ranking: 0,
           victories: 0,
           defeats: 0,
           total_championships: 0,
-          recent_championships: 0
+          recent_championships: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         }
-      } as User;
+      };
+
+      return userWithStats;
     } catch (error) {
       console.error('Error fetching user data:', error);
       return null;

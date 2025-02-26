@@ -9,11 +9,14 @@ export type UserModality = {
 }
 
 export type PlayerStatistics = {
+  user_id: string;
   ranking: number;
   victories: number;
   defeats: number;
   total_championships: number;
   recent_championships: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export type User = {
@@ -28,4 +31,3 @@ export type User = {
   updated_at: string;
   statistics?: PlayerStatistics;
 }
-
