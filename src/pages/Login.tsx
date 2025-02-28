@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_URL } from "@/integrations/api/client";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -24,9 +25,17 @@ const Login = () => {
 
     try {
       setIsLoading(true);
+      console.log('Tentando fazer login com:', {
+        email: formData.email,
+        apiUrl: API_URL
+      });
+      
       const { data, error } = await signIn(formData.email, formData.password);
 
+      console.log('Resposta do login:', { data, error });
+
       if (error) {
+        console.error('Erro detalhado:', error);
         toast.error(error.message || "Erro ao realizar login. Tente novamente.");
         return;
       }
