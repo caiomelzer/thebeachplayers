@@ -2,10 +2,35 @@
 import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
+import { apiClient } from "@/integrations/api/client";
+import { toast } from "sonner";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          toast.error("Sessão expirada");
+          navigate('/login');
+          return;
+        }
+
+        // Fazer a chamada para /api/user/me para obter dados atualizados
+        const response = await apiClient.get('/api/user/me');
+        console.log('Dados do usuário carregados:', response.data);
+      } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+        toast.error("Erro ao carregar dados do usuário");
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
 
   // Get the display name from user data, fallback to 'Usuário'
   const displayName = user?.full_name || user?.nickname || 'Usuário';
@@ -18,6 +43,10 @@ const Home = () => {
     total_championships: 0,
     recent_championships: 0
   };
+
+  if (loading) {
+    return <div className="min-h-screen bg-black text-white p-6 flex items-center justify-center">Carregando...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-black text-white p-6">

@@ -24,7 +24,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const token = localStorage.getItem('auth_token');
       if (!token) return null;
 
-      const { data } = await apiClient.get('/api/users/profile');
+      // Usar o endpoint /api/user/me para buscar os dados do usuário
+      const { data } = await apiClient.get('/api/user/me');
       
       // Transform API response to match our User type
       const userData: User = {
