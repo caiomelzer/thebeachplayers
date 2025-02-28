@@ -26,20 +26,19 @@ const Login = () => {
       setIsLoading(true);
       const { data, error } = await signIn(formData.email, formData.password);
 
-      if (error) throw error;
-
-      // Only show success and navigate if we have user data
-      if (data?.user) {
-        toast.success("Login realizado com sucesso!");
-        navigate('/home', { replace: true });
-        return; // Add early return after successful navigation
+      if (error) {
+        toast.error(error.message || "Erro ao realizar login. Tente novamente.");
+        return;
       }
 
-      // If we get here without user data, show an error
-      toast.error("Erro ao realizar login. Tente novamente.");
+      // Only show success and navigate if we have user data
+      if (data) {
+        toast.success("Login realizado com sucesso!");
+        navigate('/home', { replace: true });
+      }
     } catch (error: any) {
       console.error('Erro no login:', error);
-      toast.error("Email ou senha incorretos. Por favor, tente novamente.");
+      toast.error("Erro ao realizar login. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
     }

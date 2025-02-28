@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { apiClient } from '@/integrations/api/client';
 import type { User, PlayerStatistics } from '@/types/database';
 
 interface AuthContextType {
@@ -19,35 +19,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const fetchUserData = async (userId: string): Promise<User | null> => {
+  const fetchUserData = async (): Promise<User | null> => {
     try {
-      // Get user data
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      const token = localStorage.getItem('auth_token');
+      if (!token) return null;
 
-      if (userError) {
-        throw userError;
-      }
-
-      if (!userData) {
-        return null;
-      }
-
-      // Get user statistics
-      const { data: statsData } = await supabase
-        .from('user_statistics')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      // Combine user data with statistics
-      const userWithStats: User = {
-        ...userData,
-        statistics: statsData || {
-          user_id: userId,
+      const { data } = await apiClient.get('/api/users/profile');
+      
+      // Transform API response to match our User type
+      const userData: User = {
+        id: data.id,
+        full_name: data.full_name,
+        nickname: data.nickname,
+        avatar_url: data.avatar_url,
+        born: data.born,
+        gender: data.gender,
+        cpf: data.cpf,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        statistics: data.statistics || {
+          user_id: data.id,
           ranking: 0,
           victories: 0,
           defeats: 0,
@@ -58,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       };
 
-      return userWithStats;
+      return userData;
     } catch (error) {
       console.error('Error fetching user data:', error);
       return null;
@@ -66,101 +57,111 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Check initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const userData = await fetchUserData(session.user.id);
-        setUser(userData);
-      }
-      setLoading(false);
-    });
-
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session);
-      
-      if (session?.user) {
-        const userData = await fetchUserData(session.user.id);
-        setUser(userData);
-        if (event === 'SIGNED_IN') {
-          navigate('/home');
+    const checkAuth = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('auth_token');
+        
+        if (token) {
+          // Verify the token and get user data
+          const userData = await fetchUserData();
+          setUser(userData);
         }
-      } else {
+      } catch (error) {
+        console.error('Auth check error:', error);
+        localStorage.removeItem('auth_token');
         setUser(null);
-        if (event === 'SIGNED_OUT') {
-          navigate('/login');
-        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    checkAuth();
+  }, []);
 
   const signUp = async (email: string, password: string, document: string) => {
     try {
-      // First, check if CPF already exists
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('id')
-        .eq('cpf', document)
-        .single();
-
-      if (existingUser) {
-        throw new Error('CPF já cadastrado');
-      }
-
-      const { data, error } = await supabase.auth.signUp({
+      const response = await apiClient.post('/api/auth/register', {
         email,
         password,
-        options: {
-          data: {
-            document,
-          },
-        },
+        cpf: document
       });
 
-      if (error) throw error;
+      const { token, user: userData } = response.data;
 
-      // If signup is successful and we have a session, navigate to home
-      if (data?.user) {
-        navigate('/home');
-      }
+      // Store auth token
+      localStorage.setItem('auth_token', token);
 
-      return { data, error: null };
-    } catch (error) {
+      // Update user state
+      setUser({
+        id: userData.id,
+        full_name: userData.full_name,
+        nickname: userData.nickname,
+        avatar_url: userData.avatar_url,
+        born: userData.born,
+        gender: userData.gender,
+        cpf: userData.cpf,
+        created_at: userData.created_at,
+        updated_at: userData.updated_at,
+        statistics: userData.statistics
+      });
+
+      navigate('/home');
+      return { data: userData, error: null };
+    } catch (error: any) {
       console.error('Signup error:', error);
-      return { data: null, error };
+      
+      const errorMessage = error.response?.data?.message || 'Erro ao cadastrar';
+      return { data: null, error: { message: errorMessage } };
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const response = await apiClient.post('/api/auth/login', {
         email,
-        password,
+        password
       });
 
-      if (error) throw error;
+      const { token, user: userData } = response.data;
 
-      if (data.user) {
-        const userData = await fetchUserData(data.user.id);
-        setUser(userData);
-        // Explicitly navigate after successful signin
-        navigate('/home');
-      }
+      // Store auth token
+      localStorage.setItem('auth_token', token);
 
-      return { data, error: null };
-    } catch (error) {
-      return { data: null, error };
+      // Update user state
+      setUser({
+        id: userData.id,
+        full_name: userData.full_name,
+        nickname: userData.nickname,
+        avatar_url: userData.avatar_url,
+        born: userData.born,
+        gender: userData.gender,
+        cpf: userData.cpf,
+        created_at: userData.created_at,
+        updated_at: userData.updated_at,
+        statistics: userData.statistics
+      });
+
+      navigate('/home');
+      return { data: userData, error: null };
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      const errorMessage = error.response?.data?.message || 'Credenciais inválidas';
+      return { data: null, error: { message: errorMessage } };
     }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    setUser(null);
-    navigate('/login');
+    try {
+      // No need to call a logout endpoint since we're using token-based auth
+      // Just remove the token and user state
+      localStorage.removeItem('auth_token');
+      setUser(null);
+      navigate('/login');
+    } catch (error) {
+      console.error('Signout error:', error);
+    }
   };
 
   return (

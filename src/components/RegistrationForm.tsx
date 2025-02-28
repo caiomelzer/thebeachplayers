@@ -83,23 +83,15 @@ export const RegistrationForm = () => {
       const { data, error } = await signUp(formData.email, formData.password, formData.cpf);
       
       if (error) {
-        throw error;
+        toast.error(error.message || "Erro ao realizar cadastro. Tente novamente.");
+        return;
       }
 
-      toast.success("Cadastro realizado com sucesso! Verifique seu email para confirmar o cadastro.");
+      toast.success("Cadastro realizado com sucesso!");
       navigate('/login');
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
-      
-      if (error.message === 'CPF já cadastrado') {
-        toast.error("CPF já cadastrado");
-      } else if (error.message?.includes('Email already registered')) {
-        toast.error("Email já cadastrado");
-      } else if (error.message?.includes('Password should be at least 6 characters')) {
-        toast.error("A senha deve ter no mínimo 6 caracteres");
-      } else {
-        toast.error("Erro ao realizar cadastro. Por favor, tente novamente.");
-      }
+      toast.error("Erro ao realizar cadastro. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
     }
