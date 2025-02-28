@@ -21,7 +21,7 @@ const Index = () => {
         {/* Main Content */}
         <div className="space-y-4 mb-16">
           <h2 className="text-4xl font-bold leading-tight text-white">
-            Rankings e campeonatos em uma mesmo lugar
+            Rankings e campeonatos em um mesmo lugar
           </h2>
         </div>
 
