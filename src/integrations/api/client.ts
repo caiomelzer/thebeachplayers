@@ -7,9 +7,13 @@ export const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
+    // Adicionando Referrer Policy para lidar com o erro strict-origin-when-cross-origin
+    'Referrer-Policy': 'no-referrer-when-downgrade'
   },
   // Adicionando um timeout padrão de 10 segundos
   timeout: 10000,
+  // Permitindo credenciais para requisições cross-origin
+  withCredentials: true
 });
 
 // Interceptor para adicionar token de autenticação
@@ -20,8 +24,13 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+    // Adicionando identificador único para cada requisição para debug
+    config.headers['X-Request-Id'] = `req-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    
     // Log para debug
-    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, 
+      { headers: { ...config.headers, Authorization: token ? 'Bearer [REDACTED]' : undefined }, 
+        requestId: config.headers['X-Request-Id'] });
     
     return config;
   },
@@ -35,18 +44,21 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => {
     // Log para debug
-    console.log(`[API Response] ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`);
+    console.log(`[API Response] ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`,
+      { requestId: response.config.headers['X-Request-Id'] });
     return response;
   },
   (error) => {
     // Log detalhado de erros
     if (error.response) {
       console.error(`[API Error] ${error.response.status} ${error.config?.method?.toUpperCase()} ${error.config?.url}:`, 
-        error.response.data);
+        error.response.data, { requestId: error.config?.headers['X-Request-Id'] });
     } else if (error.request) {
-      console.error('[API Error] No response received:', error.request);
+      console.error('[API Error] No response received:', error.request, 
+        { requestId: error.config?.headers['X-Request-Id'] });
     } else {
-      console.error('[API Error] Request setup error:', error.message);
+      console.error('[API Error] Request setup error:', error.message, 
+        { requestId: error.config?.headers['X-Request-Id'] });
     }
     return Promise.reject(error);
   }

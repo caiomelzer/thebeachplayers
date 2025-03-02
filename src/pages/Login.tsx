@@ -25,18 +25,27 @@ const Login = () => {
 
     try {
       setIsLoading(true);
+      const requestId = `login-${Date.now()}`;
+      
       console.log('Tentando fazer login com:', {
         email: formData.email,
-        apiUrl: API_URL
+        apiUrl: API_URL,
+        requestId
       });
       
       const { data, error } = await signIn(formData.email, formData.password);
 
-      console.log('Resposta do login:', { data, error });
+      console.log('Resposta do login:', { data, error, requestId });
 
       if (error) {
-        console.error('Erro detalhado:', error);
-        toast.error(error.message || "Erro ao realizar login. Tente novamente.");
+        console.error('Erro detalhado:', error, { requestId });
+        
+        // Mensagens mais específicas com base no tipo de erro
+        if (error.message?.includes('CORS') || error.message?.includes('Network Error')) {
+          toast.error("Erro de comunicação com o servidor. Verifique sua conexão.");
+        } else {
+          toast.error(error.message || "Erro ao realizar login. Tente novamente.");
+        }
         return;
       }
 
@@ -47,7 +56,13 @@ const Login = () => {
       }
     } catch (error: any) {
       console.error('Erro no login:', error);
-      toast.error("Erro ao realizar login. Por favor, tente novamente.");
+      
+      // Tratamento de erro mais específico
+      if (error.message?.includes('Network Error')) {
+        toast.error("Erro de conexão. Verifique se o servidor está acessível.");
+      } else {
+        toast.error("Erro ao realizar login. Por favor, tente novamente.");
+      }
     } finally {
       setIsLoading(false);
     }
