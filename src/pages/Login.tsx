@@ -52,7 +52,11 @@ const Login = () => {
       // Only show success and navigate if we have user data
       if (data) {
         toast.success("Login realizado com sucesso!");
-        navigate('/home', { replace: true });
+        console.log("Redirecionando para /home após login bem-sucedido");
+        // Garantindo que a navegação aconteça após a atualização do estado
+        setTimeout(() => {
+          navigate('/home', { replace: true });
+        }, 100);
       }
     } catch (error: any) {
       console.error('Erro no login:', error);

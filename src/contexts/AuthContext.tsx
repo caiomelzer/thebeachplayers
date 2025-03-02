@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         statistics: userData.statistics
       });
 
-      navigate('/home');
+      // Removendo a navegação daqui para evitar conflito com o componente
       return { data: userData, error: null };
     } catch (error: any) {
       console.error('Signup error:', error);
@@ -143,7 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         statistics: userData.statistics
       });
 
-      navigate('/home');
+      // Removendo a navegação daqui para evitar conflito com o componente
       return { data: userData, error: null };
     } catch (error: any) {
       console.error('Login error:', error);
