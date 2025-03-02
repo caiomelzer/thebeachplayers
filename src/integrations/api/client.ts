@@ -7,13 +7,16 @@ export const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
-    // Adicionando Referrer Policy para lidar com o erro strict-origin-when-cross-origin
-    'Referrer-Policy': 'no-referrer-when-downgrade'
+    // Improving CORS handling with more comprehensive headers
+    'Referrer-Policy': 'no-referrer-when-downgrade',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
   },
-  // Adicionando um timeout padrão de 10 segundos
-  timeout: 10000,
-  // Permitindo credenciais para requisições cross-origin
-  withCredentials: true
+  // Increasing timeout for slower networks
+  timeout: 15000,
+  // CORS settings
+  withCredentials: false // Changed to false as it can cause CORS issues with '*' origin
 });
 
 // Interceptor para adicionar token de autenticação

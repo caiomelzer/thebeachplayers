@@ -41,8 +41,15 @@ const Login = () => {
         console.error('Erro detalhado:', error, { requestId });
         
         // Mensagens mais específicas com base no tipo de erro
-        if (error.message?.includes('CORS') || error.message?.includes('Network Error')) {
-          toast.error("Erro de comunicação com o servidor. Verifique sua conexão.");
+        if (error.message?.includes('CORS') || 
+            error.message?.includes('Network Error') || 
+            error.message?.includes('cross-origin')) {
+          toast.error("Erro de CORS ou comunicação com o servidor. Verifique sua conexão e as configurações de CORS do servidor.");
+          console.error('Erro de CORS detectado. Detalhes:', { 
+            error: error.message, 
+            origin: window.location.origin,
+            api: API_URL 
+          });
         } else {
           toast.error(error.message || "Erro ao realizar login. Tente novamente.");
         }
@@ -62,8 +69,13 @@ const Login = () => {
       console.error('Erro no login:', error);
       
       // Tratamento de erro mais específico
-      if (error.message?.includes('Network Error')) {
-        toast.error("Erro de conexão. Verifique se o servidor está acessível.");
+      if (error.message?.includes('Network Error') || error.message?.includes('CORS')) {
+        toast.error("Erro de conexão ou CORS. Verifique se o servidor está acessível e configurado corretamente.");
+        console.error('Detalhes do erro CORS:', {
+          message: error.message,
+          origin: window.location.origin,
+          apiUrl: API_URL
+        });
       } else {
         toast.error("Erro ao realizar login. Por favor, tente novamente.");
       }
