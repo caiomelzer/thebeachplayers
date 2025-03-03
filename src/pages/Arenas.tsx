@@ -8,7 +8,7 @@ import { ArenaHeader } from "./arenas/components/ArenaHeader";
 import { ArenaSearchBar } from "./arenas/components/ArenaSearchBar";
 import { ArenaFilters } from "./arenas/components/ArenaFilters";
 import { ArenaCard } from "./arenas/components/ArenaCard";
-import { fetchArenas } from "./arenas/services/arenaService";
+import { fetchArenas, fetchNearbyArenas, searchArenas } from "./arenas/services/arenaService";
 import { calculateDistance } from "./arenas/utils/distance";
 import type { ArenaWithDistance } from "./arenas/types";
 
@@ -17,12 +17,32 @@ const Arenas = () => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'near'>('all');
   const [searchTerm, setSearchTerm] = useState("");
   const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const { data: arenas = [], isLoading, error } = useQuery({
+  // Base query for all arenas
+  const { data: allArenas = [], isLoading: isLoadingAll, error: errorAll } = useQuery({
     queryKey: ['arenas'],
-    queryFn: fetchArenas
+    queryFn: fetchArenas,
+    enabled: activeFilter === 'all' && !isSearching
   });
 
+  // Query for nearby arenas
+  const { data: nearbyArenas = [], isLoading: isLoadingNearby, error: errorNearby } = useQuery({
+    queryKey: ['arenas', 'nearby', userLocation?.coords.latitude, userLocation?.coords.longitude],
+    queryFn: () => userLocation 
+      ? fetchNearbyArenas(userLocation.coords.latitude, userLocation.coords.longitude)
+      : Promise.resolve([]),
+    enabled: activeFilter === 'near' && !!userLocation && !isSearching
+  });
+
+  // Query for searched arenas
+  const { data: searchResults = [], isLoading: isLoadingSearch, error: errorSearch } = useQuery({
+    queryKey: ['arenas', 'search', searchTerm],
+    queryFn: () => searchArenas(searchTerm),
+    enabled: !!searchTerm && searchTerm.length >= 2 && isSearching
+  });
+
+  // Get user location
   useEffect(() => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -37,38 +57,47 @@ const Arenas = () => {
     }
   }, []);
 
-  const filterArenas = () => {
-    let filtered = [...arenas];
-
-    // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter(arena =>
-        arena.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        arena.address.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Calculate distances and sort if needed
-    const arenasWithDistance: ArenaWithDistance[] = filtered.map(arena => ({
-      ...arena,
-      distance: calculateDistance(arena, userLocation)
-    }));
-
-    // Apply distance filter
-    if (activeFilter === 'near') {
-      return arenasWithDistance
-        .filter(arena => arena.distance < 10) // Show arenas within 10km
-        .sort((a, b) => a.distance - b.distance);
-    }
-
-    return arenasWithDistance;
+  // Handle search input changes
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setIsSearching(value.length >= 2);
   };
 
-  const filteredArenas = filterArenas();
+  // Determine which arenas to display
+  const getDisplayedArenas = () => {
+    if (isSearching && searchTerm.length >= 2) {
+      return searchResults;
+    }
+    
+    if (activeFilter === 'near') {
+      return nearbyArenas;
+    }
+    
+    return allArenas;
+  };
 
-  if (error) {
-    toast.error("Erro ao carregar as arenas");
-  }
+  // Add distance information to the arenas
+  const arenasWithDistance: ArenaWithDistance[] = getDisplayedArenas().map(arena => ({
+    ...arena,
+    distance: calculateDistance(arena, userLocation)
+  }));
+
+  // Sort nearby arenas by distance
+  const filteredArenas = activeFilter === 'near' 
+    ? [...arenasWithDistance].sort((a, b) => a.distance - b.distance)
+    : arenasWithDistance;
+
+  // Handle errors
+  useEffect(() => {
+    if (errorAll || errorNearby || errorSearch) {
+      toast.error("Erro ao carregar as arenas");
+      console.error("Arena error:", errorAll || errorNearby || errorSearch);
+    }
+  }, [errorAll, errorNearby, errorSearch]);
+
+  const isLoading = (isLoadingAll && activeFilter === 'all') || 
+                    (isLoadingNearby && activeFilter === 'near') || 
+                    (isLoadingSearch && isSearching);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -76,7 +105,7 @@ const Arenas = () => {
         <ArenaHeader onBackClick={() => navigate('/home')} />
         <ArenaSearchBar 
           searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          onSearchChange={handleSearchChange}
         />
         <ArenaFilters 
           activeFilter={activeFilter}

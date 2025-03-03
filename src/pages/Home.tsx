@@ -2,15 +2,53 @@
 import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { apiClient } from "@/integrations/api/client";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { fetchArenas } from "./arenas/services/arenaService";
 
 const Home = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const [nearbyArenasCount, setNearbyArenasCount] = useState<number>(0);
 
-  
+  // Fetch arenas data
+  const { data: arenas = [], isLoading: arenasLoading, error: arenasError } = useQuery({
+    queryKey: ['arenas'],
+    queryFn: fetchArenas
+  });
+
+  // Calculate nearby arenas when we have user location
+  useEffect(() => {
+    if ('geolocation' in navigator && arenas.length > 0) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // Count arenas within 10km
+          const nearby = arenas.filter(arena => {
+            const R = 6371; // Earth's radius in km
+            const lat1 = position.coords.latitude * Math.PI / 180;
+            const lat2 = arena.coordinates.latitude * Math.PI / 180;
+            const deltaLat = (arena.coordinates.latitude - position.coords.latitude) * Math.PI / 180;
+            const deltaLon = (arena.coordinates.longitude - position.coords.longitude) * Math.PI / 180;
+
+            const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+                     Math.cos(lat1) * Math.cos(lat2) *
+                     Math.sin(deltaLon/2) * Math.sin(deltaLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distance = R * c;
+            
+            return distance < 10; // 10km radius
+          });
+          
+          setNearbyArenasCount(nearby.length);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+        }
+      );
+    }
+  }, [arenas]);
 
   // Get the display name from user data, fallback to 'Usuário'
   const displayName = user?.full_name || user?.nickname || 'Usuário';
@@ -150,7 +188,9 @@ const Home = () => {
                 <p className="text-sm text-zinc-400">Arenas</p>
                 <p className="font-medium">por perto</p>
               </div>
-              <span className="text-zinc-400 text-2xl font-bold">8</span>
+              <span className="text-zinc-400 text-2xl font-bold">
+                {arenasLoading ? "..." : nearbyArenasCount}
+              </span>
             </div>
           </button>
 
