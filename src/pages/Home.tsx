@@ -1,9 +1,7 @@
-
 import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { apiClient } from "@/integrations/api/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { fetchArenas } from "./arenas/services/arenaService";
@@ -13,10 +11,12 @@ const Home = () => {
   const { user, loading } = useAuth();
   const [nearbyArenasCount, setNearbyArenasCount] = useState<number>(0);
 
-  // Fetch arenas data
-  const { data: arenas = [], isLoading: arenasLoading, error: arenasError } = useQuery({
+  // Fetch arenas data with caching
+  const { data: arenas = [], isLoading: arenasLoading } = useQuery({
     queryKey: ['arenas'],
-    queryFn: fetchArenas
+    queryFn: () => fetchArenas(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false
   });
 
   // Calculate nearby arenas when we have user location

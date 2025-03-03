@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '@/integrations/api/client';
@@ -7,7 +6,7 @@ import type { User, PlayerStatistics } from '@/types/database';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, password: string, document: string) => Promise<any>;
+  signUp: (email: string, password: string, document: string, nickname: string) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<void>;
 }

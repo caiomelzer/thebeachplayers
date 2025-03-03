@@ -19,11 +19,13 @@ const Arenas = () => {
   const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
   const [isSearching, setIsSearching] = useState(false);
 
-  // Base query for all arenas
+  // Base query for all arenas, shared among all components
   const { data: allArenas = [], isLoading: isLoadingAll, error: errorAll } = useQuery({
     queryKey: ['arenas'],
-    queryFn: fetchArenas,
-    enabled: activeFilter === 'all' && !isSearching
+    queryFn: () => fetchArenas(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    enabled: !isSearching
   });
 
   // Query for nearby arenas
@@ -32,6 +34,8 @@ const Arenas = () => {
     queryFn: () => userLocation 
       ? fetchNearbyArenas(userLocation.coords.latitude, userLocation.coords.longitude)
       : Promise.resolve([]),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
     enabled: activeFilter === 'near' && !!userLocation && !isSearching
   });
 
@@ -39,6 +43,8 @@ const Arenas = () => {
   const { data: searchResults = [], isLoading: isLoadingSearch, error: errorSearch } = useQuery({
     queryKey: ['arenas', 'search', searchTerm],
     queryFn: () => searchArenas(searchTerm),
+    staleTime: 30 * 1000, // 30 seconds for search
+    refetchOnWindowFocus: false,
     enabled: !!searchTerm && searchTerm.length >= 2 && isSearching
   });
 
