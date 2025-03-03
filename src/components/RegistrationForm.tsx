@@ -6,18 +6,20 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { RegisterInput } from "./RegisterInput";
 import { TermsAgreement } from "./TermsAgreement";
-import { validateEmail, validateCPF, validatePassword } from "@/utils/validation";
+import { validateEmail, validateCPF, validatePassword, validateNickname } from "@/utils/validation";
 
 interface FormData {
   email: string;
   cpf: string;
   password: string;
+  nickname: string;
 }
 
 interface FormErrors {
   email: string;
   cpf: string;
   password: string;
+  nickname: string;
 }
 
 export const RegistrationForm = () => {
@@ -28,11 +30,13 @@ export const RegistrationForm = () => {
     email: "",
     cpf: "",
     password: "",
+    nickname: ""
   });
   const [errors, setErrors] = useState<FormErrors>({
     email: "",
     cpf: "",
     password: "",
+    nickname: ""
   });
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -56,12 +60,21 @@ export const RegistrationForm = () => {
           : "A senha deve conter no mínimo 8 caracteres, um número e um caractere especial"
       }));
     }
+    else if (field === 'nickname') {
+      setErrors(prev => ({
+        ...prev,
+        password: validateNickname(value) 
+          ? "" 
+          : "O apelido deve conter pelo menos dois caracteres"
+      }));
+    }
   };
 
   const isFormValid = () => {
     return validateEmail(formData.email) && 
            validateCPF(formData.cpf) && 
            validatePassword(formData.password) &&
+           validateNickname(formData.nickname) &&
            !isLoading;
   };
 
@@ -79,14 +92,12 @@ export const RegistrationForm = () => {
         email: formData.email,
         cpf: formData.cpf
       });
-      
-      const { data, error } = await signUp(formData.email, formData.password, formData.cpf);
-      
+      const { data, error } = await signUp(formData.email, formData.password, formData.cpf, formData.nickname);
       if (error) {
+        console.error('Erro detalhado:', error);
         toast.error(error.message || "Erro ao realizar cadastro. Tente novamente.");
         return;
       }
-
       toast.success("Cadastro realizado com sucesso!");
       navigate('/login');
     } catch (error: any) {
@@ -107,6 +118,17 @@ export const RegistrationForm = () => {
         onChange={(value) => handleInputChange('email', value)}
         error={errors.email}
         placeholder="Email"
+        disabled={isLoading}
+      />
+
+      <RegisterInput
+        id="nickname"
+        label="nickname"
+        type="text"
+        value={formData.nickname}
+        onChange={(value) => handleInputChange('nickname', value)}
+        error={errors.cpf}
+        placeholder="Apelido"
         disabled={isLoading}
       />
 

@@ -1,5 +1,5 @@
 
-import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail } from "lucide-react";
+import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
@@ -10,31 +10,13 @@ const Home = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem('auth_token');
-        if (!token) {
-          toast.error("Sessão expirada");
-          navigate('/login');
-          return;
-        }
-
-        // Fazer a chamada para /api/user/me para obter dados atualizados
-        const response = await apiClient.get('/api/user/me');
-        console.log('Dados do usuário carregados:', response.data);
-      } catch (error) {
-        console.error('Erro ao carregar dados do usuário:', error);
-        toast.error("Erro ao carregar dados do usuário");
-      }
-    };
-
-    fetchUserData();
-  }, [navigate]);
+  
 
   // Get the display name from user data, fallback to 'Usuário'
   const displayName = user?.full_name || user?.nickname || 'Usuário';
-
+  console.log(user)
+  const ranking = user?.ranking || 0;
+  const countPlayers = 0;
   // Get user statistics with default values
   const stats = user?.statistics || {
     ranking: 0,
@@ -56,13 +38,12 @@ const Home = () => {
         <div className="flex items-center gap-4">
           <button onClick={() => navigate('/championships')}>
             <Search className="w-5 h-5" />
-          </button>
+          </button>|
           <button onClick={() => navigate('/edit')}>
-            <img
-              src={user?.avatar_url || "/lovable-uploads/avatar-app.png"}
-              alt="Profile"
-              className="w-8 h-8 rounded-full"
-            />
+            <User className="w-5 h-5" />
+          </button>|
+          <button onClick={() => navigate('/')}>
+            <LogOut className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -84,10 +65,10 @@ const Home = () => {
       <div className="bg-zinc-900 rounded-xl p-4 mb-8">
         <div className="flex justify-between items-start mb-2">
           <span className="text-lg font-medium">Ranking Geral</span>
-          <span className="text-[#0EA5E9] text-xl font-bold">#{stats.ranking.toString().padStart(5, '0')}</span>
+          <span className="text-[#0EA5E9] text-xl font-bold">#{ranking.toString().padStart(5, '0')}</span>
         </div>
         <p className="text-sm text-zinc-400 mb-3">
-          Esta é a sua colocação em um total de 23457 atletas.
+          Esta é a sua colocação em um total de {countPlayers} atletas.
         </p>
         <div className="flex justify-center">
           <button 
@@ -121,23 +102,7 @@ const Home = () => {
             </div>
           </button>
 
-          {/* Victories Card */}
-          <button 
-            onClick={() => navigate('/championships', { state: { initialFilter: 'registered' } })}
-            className="bg-zinc-900 p-4 rounded-xl text-left"
-          >
-            <div className="bg-orange-900 p-2 rounded-lg w-fit mb-2">
-              <FileText className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex justify-between items-end">
-              <div>
-                <p className="text-sm text-zinc-400">Vitórias</p>
-                <p className="font-medium">Totais</p>
-              </div>
-              <span className="text-orange-500 text-2xl font-bold">{stats.victories}</span>
-            </div>
-          </button>
-
+          
           {/* Recent Championships Card */}
           <button 
             onClick={() => navigate('/championships', { state: { initialFilter: 'soon' } })}

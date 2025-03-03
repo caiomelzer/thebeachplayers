@@ -31,3 +31,8 @@ export const validatePassword = (password: string) => {
   const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
   return passwordRegex.test(password);
 };
+
+
+export const validateNickname = (nickname: string) => {
+  return nickname.length >= 2 ? true : false;
+};

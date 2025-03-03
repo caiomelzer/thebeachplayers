@@ -38,6 +38,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         cpf: data.cpf,
         created_at: data.created_at,
         updated_at: data.updated_at,
+        ranking: data.ranking,
+        rating: data.rating,
         statistics: data.statistics || {
           user_id: data.id,
           ranking: 0,
@@ -80,35 +82,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  const signUp = async (email: string, password: string, document: string) => {
+  const signUp = async (email: string, password: string, document: string, nickname: string) => {
     try {
       const response = await apiClient.post('/api/auth/register', {
         email,
         password,
-        cpf: document
+        cpf: document,
+        nickname
       });
-
-      const { token, user: userData } = response.data;
-
-      // Store auth token
-      localStorage.setItem('auth_token', token);
-
-      // Update user state
-      setUser({
-        id: userData.id,
-        full_name: userData.full_name,
-        nickname: userData.nickname,
-        avatar_url: userData.avatar_url,
-        born: userData.born,
-        gender: userData.gender,
-        cpf: userData.cpf,
-        created_at: userData.created_at,
-        updated_at: userData.updated_at,
-        statistics: userData.statistics
-      });
-
-      // Removendo a navegação daqui para evitar conflito com o componente
-      return { data: userData, error: null };
+      return response;
     } catch (error: any) {
       console.error('Signup error:', error);
       
@@ -140,7 +122,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         cpf: userData.cpf,
         created_at: userData.created_at,
         updated_at: userData.updated_at,
-        statistics: userData.statistics
+        statistics: userData.statistics,
+        ranking: userData.ranking,
+        rating: userData.rating
       });
 
       // Removendo a navegação daqui para evitar conflito com o componente

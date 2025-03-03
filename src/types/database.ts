@@ -29,5 +29,7 @@ export type User = {
   cpf: string;
   created_at: string;
   updated_at: string;
+  ranking?: number;
+  rating?: number;
   statistics?: PlayerStatistics;
 }
