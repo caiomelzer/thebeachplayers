@@ -16,10 +16,22 @@ export const fetchArenas = async (forceRefresh = false) => {
   }
 
   try {
-    console.log('Fetching arenas from API');
-    const response = await apiClient.get('/api/arenas');
+    console.log("Fetching arenas from API");
+    const response = await apiClient.get("/api/arenas");
     
-    // Map the response data to match our Arena type
+    console.log("Resposta completa da API:", response);
+
+    if (!response.data) {
+      throw new Error("A resposta da API está vazia.");
+    }
+
+    console.log("Conteúdo de response.data:", response.data);
+
+    if (!Array.isArray(response.data)) {
+      throw new Error("response.data não é um array.");
+    }
+
+    // Mapear corretamente
     const arenas = response.data.map((arena: any) => ({
       id: arena.id,
       name: arena.name,
@@ -27,19 +39,19 @@ export const fetchArenas = async (forceRefresh = false) => {
       main_image_url: arena.main_image_url || null,
       coordinates: {
         latitude: arena.latitude || 0,
-        longitude: arena.longitude || 0
-      }
+        longitude: arena.longitude || 0,
+      },
     }));
-    
-    // Update cache
+
     arenasCache = arenas;
     lastFetchTime = now;
-    
+
     return arenas;
-  } catch (error) {
-    console.error('Error fetching arenas:', error);
+} catch (error) {
+    console.error("Error fetching arenas:", error);
     throw error;
-  }
+}
+
 };
 
 // Function to fetch arenas near a location

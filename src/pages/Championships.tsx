@@ -1,76 +1,34 @@
-
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addDays, isBefore, isAfter, parseISO } from "date-fns";
+
+const API_URL = "http://143.198.75.127:3000/api/championships/";
 
 const Championships = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<'all' | 'soon' | 'registered'>('all');
   const [searchTerm, setSearchTerm] = useState("");
+  const [championships, setChampionships] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const championships = [
-    {
-      id: 1,
-      title: "R2 - Segunda Etapa",
-      date: "2024-03-01",
-      category: "Dupla Mista Iniciante",
-      status: "Você não pode participar desta categoria",
-      isDisabled: true,
-      isRegistered: false,
-      logo: "/lovable-uploads/logo-r2.png"
-    },
-    {
-      id: 2,
-      title: "R2 - Segunda Etapa",
-      date: "2024-03-16",
-      category: "Dupla Mista Intermediária",
-      price: "R$90 por atleta",
-      isDisabled: false,
-      isRegistered: true,
-      logo: "/lovable-uploads/logo.png"
-    },
-    {
-      id: 3,
-      title: "R2 - Segunda Etapa",
-      date: "2024-03-16",
-      category: "Dupla Masculina Iniciante",
-      status: "Você não pode participar desta categoria",
-      isDisabled: true,
-      isRegistered: false,
-      logo: "/lovable-uploads/logo-r2.png"
-    },
-    {
-      id: 4,
-      title: "R2 - Segunda Etapa",
-      date: "2024-03-16",
-      category: "Dupla Mista Iniciante",
-      status: "Você não pode participar desta categoria",
-      isDisabled: true,
-      isRegistered: false,
-      logo: "/lovable-uploads/logo-r2.png"
-    },
-    {
-      id: 5,
-      title: "R2 - Segunda Etapa",
-      date: "2024-03-16",
-      category: "Dupla Mista Intermediária",
-      price: "R$90 por atleta",
-      isDisabled: false,
-      isRegistered: true,
-      logo: "/lovable-uploads/logo.png"
-    },
-    {
-      id: 6,
-      title: "R2 - Segunda Etapa",
-      date: "2024-03-16",
-      category: "Dupla Masculina Iniciante",
-      status: "Você não pode participar desta categoria",
-      isDisabled: true,
-      isRegistered: false,
-      logo: "/lovable-uploads/logo-r2.png"
-    },
-  ];
+  useEffect(() => {
+    const fetchChampionships = async () => {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error("Erro ao buscar campeonatos");
+        const data = await response.json();
+        setChampionships(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChampionships();
+  }, []);
 
   const filterChampionships = () => {
     const today = new Date();
@@ -110,6 +68,9 @@ const Championships = () => {
     const [year, month, day] = dateString.split('-');
     return `${day}/${month}/${year.slice(2)}`;
   };
+
+  if (loading) return <p className="text-center text-white">Carregando...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="min-h-screen bg-black text-white">
