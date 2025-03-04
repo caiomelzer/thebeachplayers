@@ -1,158 +1,73 @@
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { addDays, isBefore, isAfter, parseISO } from "date-fns";
 
-const API_URL = "http://143.198.75.127:3000/api/championships/";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+
+import { fetchChampionships } from "./championships/services/championshipService";
+import { applyChampionshipFilters } from "./championships/utils/filters";
+import { ChampionshipHeader } from "./championships/components/ChampionshipHeader";
+import { ChampionshipSearchBar } from "./championships/components/ChampionshipSearchBar";
+import { ChampionshipFilters } from "./championships/components/ChampionshipFilters";
+import { ChampionshipCard } from "./championships/components/ChampionshipCard";
 
 const Championships = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<'all' | 'soon' | 'registered'>('all');
   const [searchTerm, setSearchTerm] = useState("");
-  const [championships, setChampionships] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchChampionships = async () => {
-      try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error("Erro ao buscar campeonatos");
-        const data = await response.json();
-        setChampionships(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChampionships();
-  }, []);
-
-  const filterChampionships = () => {
-    const today = new Date();
-    const fifteenDaysFromNow = addDays(today, 15);
-
-    let filtered = championships;
-
-    // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter(championship =>
-        championship.title.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const { 
+    data: championships = [], 
+    isLoading, 
+    error 
+  } = useQuery({
+    queryKey: ['championships'],
+    queryFn: () => fetchChampionships(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    onError: (error) => {
+      console.error("Error fetching championships:", error);
+      toast.error("Erro ao buscar campeonatos");
     }
+  });
 
-    // Apply active filter
-    switch (activeFilter) {
-      case 'soon':
-        filtered = filtered.filter(championship => {
-          const championshipDate = parseISO(championship.date);
-          return isAfter(championshipDate, today) && isBefore(championshipDate, fifteenDaysFromNow);
-        });
-        break;
-      case 'registered':
-        filtered = filtered.filter(championship => championship.isRegistered);
-        break;
-      default:
-        // 'all' case - no additional filtering needed
-        break;
-    }
+  const filteredChampionships = applyChampionshipFilters(
+    championships,
+    activeFilter,
+    searchTerm
+  );
 
-    return filtered;
-  };
-
-  const filteredChampionships = filterChampionships();
-
-  const formatDisplayDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year.slice(2)}`;
-  };
-
-  if (loading) return <p className="text-center text-white">Carregando...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (isLoading) return <p className="text-center text-white">Carregando...</p>;
+  if (error) return <p className="text-center text-red-500">{(error as Error).message}</p>;
 
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button 
-            onClick={() => navigate('/home')}
-            className="bg-[#0EA5E9] p-2 rounded-lg"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-xl font-bold flex-1 text-center">Campeonatos</h1>
-          <div className="w-8"></div>
-        </div>
+        <ChampionshipHeader onBackClick={() => navigate('/home')} />
+        
+        <ChampionshipSearchBar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+        />
+        
+        <ChampionshipFilters
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+        />
 
-        {/* Search Bar */}
-        <div className="mb-6">
-          <input
-            type="text"
-            placeholder="Buscar"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-zinc-900 text-white px-4 py-3 rounded-lg"
-          />
-        </div>
+        {filteredChampionships.length === 0 && (
+          <div className="text-center py-8 text-zinc-400">
+            Nenhum campeonato encontrado
+          </div>
+        )}
 
-        {/* Filters */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          <button 
-            onClick={() => setActiveFilter('all')}
-            className={`px-4 py-2 rounded-full text-center ${
-              activeFilter === 'all' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
-            }`}
-          >
-            Todos
-          </button>
-          <button 
-            onClick={() => setActiveFilter('soon')}
-            className={`px-4 py-2 rounded-full text-center ${
-              activeFilter === 'soon' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
-            }`}
-          >
-            Em breve
-          </button>
-          <button 
-            onClick={() => setActiveFilter('registered')}
-            className={`px-4 py-2 rounded-full text-center ${
-              activeFilter === 'registered' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
-            }`}
-          >
-            Inscrito
-          </button>
-        </div>
-
-        {/* Championships List */}
         <div className="space-y-4">
           {filteredChampionships.map((championship) => (
-            <button
+            <ChampionshipCard
               key={championship.id}
-              className="w-full bg-zinc-900 rounded-lg p-4 flex items-center text-left"
-              disabled={championship.isDisabled}
-              onClick={() => !championship.isDisabled && navigate(`/championship/${championship.id}`)}
-            >
-              <div className="mr-4">
-                <img
-                  src={championship.logo}
-                  alt="Championship logo"
-                  className="w-12 h-12 rounded-lg"
-                />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium">{championship.title}</h3>
-                <p className="text-sm text-zinc-400">
-                  {formatDisplayDate(championship.date)} - {championship.category}
-                </p>
-                <p className={`text-sm ${championship.isDisabled ? 'text-red-500' : 'text-zinc-400'}`}>
-                  {championship.status || championship.price}
-                </p>
-              </div>
-              <div className="text-zinc-400">›</div>
-            </button>
+              championship={championship}
+              onClick={(id) => navigate(`/championship/${id}`)}
+            />
           ))}
         </div>
       </div>
