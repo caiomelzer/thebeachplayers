@@ -1,3 +1,4 @@
+
 import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,12 +7,14 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { fetchArenas } from "./arenas/services/arenaService";
 import { fetchChampionships } from "./championships/services/championshipService";
+import { fetchPlayers } from "./players/services/playerService";
+import { apiClient } from "@/integrations/api/client";
 
-import Championship from "./Championship";
+const MODALITY_ID = "9adbe036-f565-11ef-81b8-be0df3cad36e"; // Hardcoded modality ID
 
 const Home = () => {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const [nearbyArenasCount, setNearbyArenasCount] = useState<number>(0);
 
   // Fetch arenas data with caching
@@ -22,7 +25,21 @@ const Home = () => {
     refetchOnWindowFocus: false
   });
 
-  
+  // Fetch championships data
+  const { data: championshipsData = [], isLoading: championshipsLoading } = useQuery({
+    queryKey: ['championships', MODALITY_ID],
+    queryFn: () => fetchChampionships(MODALITY_ID),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false
+  });
+
+  // Fetch players data
+  const { data: playersData = [], isLoading: playersLoading } = useQuery({
+    queryKey: ['players', MODALITY_ID],
+    queryFn: () => fetchPlayers(MODALITY_ID),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false
+  });
 
   // Calculate nearby arenas when we have user location
   useEffect(() => {
@@ -55,13 +72,26 @@ const Home = () => {
     }
   }, [arenas]);
 
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast.error('Erro ao fazer logout');
+    }
+  };
+
   // Get the display name from user data, fallback to 'Usuário'
   const displayName = user?.full_name || user?.nickname || 'Usuário';
-  console.log(user)
   const ranking = user?.ranking || 0;
-  const countPlayers = 0;
-  const championships = 12;
-  const players = 333;
+  
+  // Use the count from the API responses
+  const countPlayers = playersLoading ? 0 : playersData.length;
+  const championships = championshipsLoading ? 0 : championshipsData.length;
+  const players = playersLoading ? 0 : playersData.length;
+  
   // Get user statistics with default values
   const stats = user?.statistics || {
     ranking: 0,
@@ -87,7 +117,7 @@ const Home = () => {
           <button onClick={() => navigate('/edit')}>
             <User className="w-5 h-5" />
           </button>|
-          <button onClick={() => navigate('/')}>
+          <button onClick={handleLogout}>
             <LogOut className="w-5 h-5" />
           </button>
         </div>

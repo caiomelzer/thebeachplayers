@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '@/integrations/api/client';
@@ -26,6 +27,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Usar o endpoint /api/user/me para buscar os dados do usuário
       const { data } = await apiClient.get('/api/user/me');
       
+      if (!data) return null;
+      
       // Transform API response to match our User type
       const userData: User = {
         id: data.id,
@@ -39,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         updated_at: data.updated_at,
         ranking: data.ranking,
         rating: data.rating,
+        modalities: data.modalities || [],
         statistics: data.statistics || {
           user_id: data.id,
           ranking: 0,
@@ -110,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Store auth token
       localStorage.setItem('auth_token', token);
 
-      // Update user state
+      // Update user state with all the properties
       setUser({
         id: userData.id,
         full_name: userData.full_name,
@@ -123,10 +127,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         updated_at: userData.updated_at,
         statistics: userData.statistics,
         ranking: userData.ranking,
-        rating: userData.rating
+        rating: userData.rating,
+        modalities: userData.modalities || []
       });
 
-      // Removendo a navegação daqui para evitar conflito com o componente
       return { data: userData, error: null };
     } catch (error: any) {
       console.error('Login error:', error);
@@ -138,13 +142,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // No need to call a logout endpoint since we're using token-based auth
-      // Just remove the token and user state
+      // Remove the token from local storage
       localStorage.removeItem('auth_token');
+      // Clear the user state
       setUser(null);
+      // Redirect to login page
       navigate('/login');
+      return Promise.resolve();
     } catch (error) {
       console.error('Signout error:', error);
+      return Promise.reject(error);
     }
   };
 

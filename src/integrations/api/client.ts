@@ -27,6 +27,11 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+    // For multipart/form-data requests, don't set content-type to allow browser to set it with boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+    
     // Adicionando identificador único para cada requisição para debug
     config.headers['X-Request-Id'] = `req-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     

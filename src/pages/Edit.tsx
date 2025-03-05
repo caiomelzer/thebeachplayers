@@ -1,9 +1,9 @@
 
 import { ArrowLeft, Camera } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { apiClient } from "@/integrations/api/client";
 import { toast } from "sonner";
 import type { UserModality } from "@/types/database";
 
@@ -11,7 +11,7 @@ type Modality = UserModality['modality'];
 
 const Edit = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -20,35 +20,13 @@ const Edit = () => {
     born: user?.born || "",
     gender: user?.gender || "",
   });
-  const [selectedModalities, setSelectedModalities] = useState<Modality[]>([]);
-
-  useEffect(() => {
-    const fetchUserModalities = async () => {
-      if (!user) return;
-
-      try {
-        const { data: modalities, error } = await supabase
-          .from('user_modalities')
-          .select('modality')
-          .eq('user_id', user.id)
-          .eq('status', 'active');
-
-        if (error) throw error;
-
-        if (modalities) {
-          setSelectedModalities(modalities.map(m => m.modality));
-        }
-      } catch (error) {
-        console.error('Error fetching modalities:', error);
-      }
-    };
-
-    fetchUserModalities();
-  }, [user]);
+  const [selectedModalities, setSelectedModalities] = useState<Modality[]>(
+    user?.modalities?.map(m => m.modality as Modality) || []
+  );
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      await signOut();
       navigate('/');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -68,21 +46,17 @@ const Edit = () => {
       const formData = new FormData();
       formData.append('avatar', file);
 
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error('No session');
-
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upload-avatar`, {
-        method: 'POST',
-        body: formData,
+      const response = await apiClient.put('/api/user/avatar', formData, {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'multipart/form-data',
         },
       });
 
-      if (!response.ok) throw new Error('Upload failed');
-
-      const { avatarUrl } = await response.json();
-      toast.success('Foto atualizada com sucesso!');
+      if (response.status === 200) {
+        toast.success('Foto atualizada com sucesso!');
+      } else {
+        throw new Error('Upload failed');
+      }
     } catch (error) {
       console.error('Error uploading avatar:', error);
       toast.error('Erro ao atualizar a foto');
@@ -106,38 +80,20 @@ const Edit = () => {
     try {
       if (!user?.id) throw new Error('No user ID');
 
-      // Update user profile
-      const { error: profileError } = await supabase
-        .from('users')
-        .update(formData)
-        .eq('id', user.id);
+      // Update user profile using the API
+      const response = await apiClient.put('/api/user/me', {
+        ...formData,
+        modalities: selectedModalities.map(modality => ({
+          modality,
+          status: 'active'
+        }))
+      });
 
-      if (profileError) throw profileError;
-
-      // Delete existing modalities
-      const { error: deleteError } = await supabase
-        .from('user_modalities')
-        .delete()
-        .eq('user_id', user.id);
-
-      if (deleteError) throw deleteError;
-
-      // Insert new modalities
-      if (selectedModalities.length > 0) {
-        const modalitiesData = selectedModalities.map(modality => ({
-          user_id: user.id,
-          modality: modality as Modality,
-          status: 'active' as const
-        }));
-
-        const { error: modalitiesError } = await supabase
-          .from('user_modalities')
-          .insert(modalitiesData);
-
-        if (modalitiesError) throw modalitiesError;
+      if (response.status === 200) {
+        toast.success('Perfil atualizado com sucesso!');
+      } else {
+        throw new Error('Update failed');
       }
-
-      toast.success('Perfil atualizado com sucesso!');
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Erro ao atualizar perfil');
