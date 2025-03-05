@@ -34,7 +34,7 @@ const ArenaDetails = () => {
   if (isLoading) return <p className="text-center text-white">Carregando...</p>;
   if (error) return <p className="text-center text-red-500">{(error as Error).message}</p>;
   if (!arena) return <p className="text-center text-white">Nenhuma informação disponível.</p>;
-  console.log('arena:', arena, arena.images);
+  console.log('arena:', arena);
 
   return (
     <div className="min-h-screen bg-black text-white">

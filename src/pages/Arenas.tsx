@@ -104,7 +104,7 @@ const Arenas = () => {
   const isLoading = (isLoadingAll && activeFilter === 'all') || 
                     (isLoadingNearby && activeFilter === 'near') || 
                     (isLoadingSearch && isSearching);
-
+  console.log('filteredArenas:', allArenas);
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="p-6">

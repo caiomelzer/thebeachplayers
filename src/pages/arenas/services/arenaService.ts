@@ -36,7 +36,7 @@ export const fetchArenas = async (forceRefresh = false) => {
       id: arena.id,
       name: arena.name,
       address: arena.address,
-      main_image_url: arena.main_image_url || null,
+      logo: arena.logo || null,
       coordinates: {
         latitude: arena.latitude || 0,
         longitude: arena.longitude || 0,

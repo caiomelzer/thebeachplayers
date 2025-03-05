@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { fetchChampionshipDetail } from "./championships/services/championshipDetailService";
 import { ChampionshipDetailHeader } from "./championships/components/ChampionshipDetailHeader";
+const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e"; // Hardcoded modality ID
 
 const Championship = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Championship = () => {
     error 
   } = useQuery({
     queryKey: ['championship', id],
-    queryFn: () => id ? fetchChampionshipDetail(id) : Promise.reject(new Error("ID não fornecido")),
+    queryFn: () => id ? fetchChampionshipDetail(id, modalityId) : Promise.reject(new Error("ID não fornecido")),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
     meta: {
@@ -26,10 +27,11 @@ const Championship = () => {
       }
     }
   });
+  console.log('championship:', championship);
 
   const handlePriceClick = () => {
     const message = encodeURIComponent("Olá, gostaria de mais informações sobre os valores do campeonato.");
-    window.open(`https://wa.me/5511980872469?text=${message}`, '_blank');
+    window.open(`https://wa.me/55${championship.contact}?text=${message}`, '_blank');
   };
 
   if (isLoading) return <p className="text-center text-white">Carregando...</p>;
@@ -59,7 +61,7 @@ const Championship = () => {
           <div className="bg-zinc-900 rounded-lg p-4">
             <h3 className="font-medium mb-2">Sobre</h3>
             <p className="text-sm text-zinc-400">
-              {championship.description || "Sem informações por enquanto."}
+              {championship.disclaimmer || "Sem informações por enquanto."}
             </p>
           </div>
 
@@ -67,7 +69,8 @@ const Championship = () => {
           <div className="bg-zinc-900 rounded-lg p-4">
             <h3 className="font-medium mb-2">Local e Data</h3>
             <p className="text-[#0EA5E9] mb-2">
-              {new Date(championship.occurs).toLocaleDateString('pt-BR')} às {new Date(championship.occurs).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              
+              {new Date(championship.occurs).toLocaleDateString('pt-BR')} às {new Date(championship.occurs).toISOString().replace('T', ' ').substring(10, 16)}
             </p>
             <p className="text-sm text-zinc-400">
               {championship.arena_id }
@@ -80,21 +83,20 @@ const Championship = () => {
           {/* Participants and Spots */}
           <div className="flex gap-4 mb-6">
             <div className="flex-1 bg-zinc-900 rounded-lg p-4 text-center">
-              <p className="text-3xl font-bold">{championship.registered_teams_count || 16}</p>
+              <p className="text-3xl font-bold">{championship.max_teams || 0}</p>
               <p className="text-sm text-zinc-400">Participantes</p>
             </div>
             <div className="flex-1 bg-zinc-900 rounded-lg p-4 text-center">
-              <p className="text-3xl font-bold">{championship.available_spots || 4}</p>
+              <p className="text-3xl font-bold">{championship.free || 0}</p>
               <p className="text-sm text-zinc-400">Vagas disp.</p>
             </div>
           </div>
-
           {/* Rules Button */}
           <button 
-            onClick={() => navigate(`/championship/${id}/rules`)}
-            className="w-full bg-zinc-900 rounded-lg p-4 text-left"
+            onClick={() => navigate(`/championship/${id}/`)}
+            className="w-full bg-zinc-900 rounded-lg p-4 text-left "
           >
-            <p className="text-center">Clique aqui para ler as regras</p>
+            <p className="text-center">Clique aqui para ler as regras (Em breve)</p>
           </button>
 
           {/* Pricing */}
@@ -104,22 +106,15 @@ const Championship = () => {
               onClick={handlePriceClick}
               className="w-full bg-zinc-900 rounded-lg p-4 flex justify-between items-center"
             >
-              <span>Está é minha primeira categoria</span>
-              <span className="text-[#0EA5E9]">R${championship.price || 110}</span>
-            </button>
-            <button 
-              onClick={handlePriceClick}
-              className="w-full bg-zinc-900 rounded-lg p-4 flex justify-between items-center"
-            >
-              <span>Já estou inscrito em outra categoria</span>
-              <span className="text-[#0EA5E9]">R${Math.floor(Number(championship.price || 110) * 0.8) || 90}</span>
+              <span>Inscrição por pessoa</span>
+              <span className="text-[#0EA5E9]">R${championship.price}</span>
             </button>
           </div>
-
+          
           {/* Participants List */}
           <div className="space-y-3 pb-6">
-            <h3 className="text-zinc-400">Participantes ({championship.registered_teams_count || 12} inscritos)</h3>
-            {(championship.teams || [{}, {}, {}]).map((team, i) => (
+            <h3 className="text-zinc-400">Participantes ({championship.registered_teams_count || 0} inscritos)</h3>
+            {(championship.teams || []).map((team, i) => (
               <button
                 key={team.id || i}
                 onClick={() => navigate('/complaint')}

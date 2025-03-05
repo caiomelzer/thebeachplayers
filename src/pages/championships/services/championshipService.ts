@@ -6,8 +6,9 @@ let championshipsCache: any[] | null = null;
 let lastFetchTime = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
 
-export const fetchChampionships = async (forceRefresh = false) => {
+export const fetchChampionships = async (modalityId?: string, forceRefresh = false) => {
   // Return cached data if available and not expired
+  console.log('modalityId:', modalityId);
   const now = Date.now();
   if (!forceRefresh && championshipsCache && now - lastFetchTime < CACHE_TTL) {
     console.log('Using cached championships data');
@@ -16,7 +17,7 @@ export const fetchChampionships = async (forceRefresh = false) => {
 
   try {
     console.log("Fetching championships from API");
-    const response = await apiClient.get("/api/championships");
+    const response = await apiClient.get("/api/championships/" + modalityId);
     
     if (!response.data) {
       throw new Error("A resposta da API está vazia.");

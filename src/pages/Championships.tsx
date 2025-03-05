@@ -10,6 +10,7 @@ import { ChampionshipHeader } from "./championships/components/ChampionshipHeade
 import { ChampionshipSearchBar } from "./championships/components/ChampionshipSearchBar";
 import { ChampionshipFilters } from "./championships/components/ChampionshipFilters";
 import { ChampionshipCard } from "./championships/components/ChampionshipCard";
+const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e"; // Hardcoded modality ID
 
 const Championships = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const Championships = () => {
     error 
   } = useQuery({
     queryKey: ['championships'],
-    queryFn: () => fetchChampionships(),
+    queryFn: () => fetchChampionships(modalityId),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
     meta: {

@@ -3,7 +3,7 @@ export interface Arena {
   id: string;
   name: string;
   address: string;
-  main_image_url: string | null;
+  logo: string | null;
   coordinates: {
     latitude: number;
     longitude: number;

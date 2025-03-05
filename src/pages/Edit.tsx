@@ -23,7 +23,7 @@ const Edit = () => {
   const [selectedModalities, setSelectedModalities] = useState<Modality[]>(
     user?.modalities?.map(m => m.modality as Modality) || []
   );
-
+  console.log(user);
   const handleLogout = async () => {
     try {
       await signOut();
@@ -91,6 +91,7 @@ const Edit = () => {
 
       if (response.status === 200) {
         toast.success('Perfil atualizado com sucesso!');
+        navigate('/home');
       } else {
         throw new Error('Update failed');
       }
@@ -101,7 +102,7 @@ const Edit = () => {
       setIsLoading(false);
     }
   };
-
+  console.log(user);
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="p-6">
@@ -115,7 +116,7 @@ const Edit = () => {
         <div className="flex flex-col items-center mb-6">
           <div className="relative">
             <img
-              src={user?.avatar_url || "/lovable-uploads/kleber.png"}
+              src={'http://143.198.75.127:3000'+user?.avatar_url || "/lovable-uploads/avatar.png"}
               alt="Profile"
               className="w-24 h-24 rounded-full mb-4 cursor-pointer"
               onClick={handleAvatarClick}
@@ -135,7 +136,7 @@ const Edit = () => {
             />
           </div>
           <h1 className="text-2xl font-bold">{user?.full_name || 'Nome do Usuário'}</h1>
-          <p className="text-zinc-400">{user?.id}</p>
+          <p className="text-zinc-400">Seu ID: {user?.id}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
@@ -186,7 +187,7 @@ const Edit = () => {
           <div className="space-y-2">
             <label className="text-zinc-400">Modalidades:</label>
             <div className="flex gap-2 flex-wrap">
-              {(['volei', 'futvolei', 'beach_tennis'] as const).map(modality => (
+              {(['Vôlei'] as const).map(modality => (
                 <button
                   key={modality}
                   type="button"

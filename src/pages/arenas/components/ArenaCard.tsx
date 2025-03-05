@@ -15,7 +15,7 @@ export const ArenaCard = ({ arena, activeFilter, onClick }: ArenaCardProps) => {
     >
       <div className="mr-4">
         <img
-          src={arena.main_image_url || "/placeholder.svg"}
+          src={arena.logo || "/placeholder.svg"}
           alt={arena.name}
           className="w-16 h-16 rounded-lg object-cover"
         />
