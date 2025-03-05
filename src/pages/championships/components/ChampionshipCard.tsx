@@ -2,11 +2,13 @@
 interface Championship {
   id: string;
   title: string;
-  date: string;
+  date?: string;
+  occurs?: string;
   category: string;
   status?: string;
   price?: string;
-  logo: string;
+  logo?: string;
+  banner_url?: string;
   isDisabled?: boolean;
   isRegistered?: boolean;
 }
@@ -18,7 +20,11 @@ interface ChampionshipCardProps {
 
 export const ChampionshipCard = ({ championship, onClick }: ChampionshipCardProps) => {
   const formatDisplayDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('T')[0].split('-');
+    if (!dateString) return "";
+    const datePart = dateString.split('T')[0];
+    if (!datePart) return "";
+    
+    const [year, month, day] = datePart.split('-');
     return `${day}/${month}/${year.slice(2)}`;
   };
 
@@ -30,7 +36,7 @@ export const ChampionshipCard = ({ championship, onClick }: ChampionshipCardProp
     >
       <div className="mr-4">
         <img
-          src={championship.banner_url}
+          src={championship.banner_url || championship.logo || "/placeholder.svg"}
           alt="Championship logo"
           className="w-12 h-12 rounded-lg"
         />
@@ -38,7 +44,7 @@ export const ChampionshipCard = ({ championship, onClick }: ChampionshipCardProp
       <div className="flex-1">
         <h3 className="font-medium">{championship.title}</h3>
         <p className="text-sm text-zinc-400">
-          {formatDisplayDate(championship.occurs)} - {championship.category}
+          {formatDisplayDate(championship.occurs || championship.date || "")} - {championship.category}
         </p>
         <p className={`text-sm ${championship.isDisabled ? 'text-red-500' : 'text-zinc-400'}`}>
           {championship.status || championship.price}
