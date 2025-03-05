@@ -18,7 +18,7 @@ interface ChampionshipCardProps {
 
 export const ChampionshipCard = ({ championship, onClick }: ChampionshipCardProps) => {
   const formatDisplayDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('-');
+    const [year, month, day] = dateString.split('T')[0].split('-');
     return `${day}/${month}/${year.slice(2)}`;
   };
 
@@ -30,7 +30,7 @@ export const ChampionshipCard = ({ championship, onClick }: ChampionshipCardProp
     >
       <div className="mr-4">
         <img
-          src={championship.logo}
+          src={championship.banner_url}
           alt="Championship logo"
           className="w-12 h-12 rounded-lg"
         />
@@ -38,7 +38,7 @@ export const ChampionshipCard = ({ championship, onClick }: ChampionshipCardProp
       <div className="flex-1">
         <h3 className="font-medium">{championship.title}</h3>
         <p className="text-sm text-zinc-400">
-          {formatDisplayDate(championship.date)} - {championship.category}
+          {formatDisplayDate(championship.occurs)} - {championship.category}
         </p>
         <p className={`text-sm ${championship.isDisabled ? 'text-red-500' : 'text-zinc-400'}`}>
           {championship.status || championship.price}

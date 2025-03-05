@@ -8,30 +8,22 @@ import {
 } from "@/components/ui/carousel";
 
 interface ArenaImageCarouselProps {
-  images: string[];
+  images: string;
   arenaName: string;
 }
 
 export const ArenaImageCarousel = ({ images, arenaName }: ArenaImageCarouselProps) => {
+  console.log('ArenaImageCarousel render');
+  console.log('images:', images);
   return (
     <div className="mb-6">
-      <Carousel className="w-full">
-        <CarouselContent>
-          {images?.map((image, index) => (
-            <CarouselItem key={index}>
-              <div className="aspect-video w-full">
-                <img
-                  src={image}
-                  alt={`${arenaName} - Image ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="left-4" />
-        <CarouselNext className="right-4" />
-      </Carousel>
+      <div className="aspect-video w-full">
+        <img
+          src={images}
+          alt={arenaName}
+          className="w-full h-full object-cover"
+        />
+      </div>
     </div>
   );
 };

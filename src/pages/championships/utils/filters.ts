@@ -15,12 +15,10 @@ interface Championship {
 
 export const filterUpcomingChampionships = (championships: Championship[]) => {
   if (!championships || championships.length === 0) return [];
-  
   const today = new Date();
   const fifteenDaysFromNow = addDays(today, 15);
-  
   return championships.filter(championship => {
-    const championshipDate = parseISO(championship.date);
+    const championshipDate = parseISO(championship.occurs);
     return isAfter(championshipDate, today) && isBefore(championshipDate, fifteenDaysFromNow);
   });
 };

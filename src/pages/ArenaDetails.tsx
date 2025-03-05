@@ -32,15 +32,14 @@ const ArenaDetails = () => {
   if (isLoading) return <p className="text-center text-white">Carregando...</p>;
   if (error) return <p className="text-center text-red-500">{(error as Error).message}</p>;
   if (!arena) return <p className="text-center text-white">Nenhuma informação disponível.</p>;
+console.log('arena:', arena, arena.images);
 
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="relative">
         <ArenaDetailHeader onBackClick={() => navigate('/arenas')} />
 
-        {arena.images && arena.images.length > 0 && (
-          <ArenaImageCarousel images={arena.images} arenaName={arena.name} />
-        )}
+        <ArenaImageCarousel images={arena.main_image_url} arenaName={arena.name} />
 
         <div className="p-6 space-y-6">
           <div>

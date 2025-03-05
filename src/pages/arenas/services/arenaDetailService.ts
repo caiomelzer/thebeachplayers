@@ -16,17 +16,17 @@ export const fetchArenaDetail = async (id: string, forceRefresh = false) => {
 
   try {
     console.log(`Fetching arena detail from API for ID: ${id}`);
-    const response = await apiClient.get(`/api/arena/${id}`);
+    const response = await apiClient.get(`/api/arenas/${id}`);
     
     if (!response.data) {
       throw new Error("A resposta da API está vazia.");
     }
 
     // Cache the response
-    arenaDetailCache[id] = response.data;
+    arenaDetailCache[id] = response.data[0];
     lastFetchTimes[id] = now;
 
-    return response.data;
+    return response.data[0];
   } catch (error) {
     console.error("Error fetching arena detail:", error);
     throw error;
