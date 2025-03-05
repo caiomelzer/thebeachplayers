@@ -2,8 +2,9 @@
 interface Player {
   id: string;
   nickname: string;
+  full_name: string;
   name: string;
-  category: string;
+  rating: string;
   avatar_url: string;
 }
 
@@ -13,6 +14,8 @@ interface PlayerCardProps {
 }
 
 export const PlayerCard = ({ player, onClick }: PlayerCardProps) => {
+  console.log('PlayerCard render');
+  console.log('player:', player);
   return (
     <button
       key={player.id}
@@ -27,9 +30,8 @@ export const PlayerCard = ({ player, onClick }: PlayerCardProps) => {
         />
       </div>
       <div className="flex-1">
-        <h3 className="font-medium">{player.nickname}</h3>
-        <p className="text-sm text-zinc-400">{player.name}</p>
-        <p className="text-sm text-zinc-400">{player.category}</p>
+        <h3 className="font-medium">{player.nickname} <span className="text-sm text-zinc-400">({player.full_name})</span></h3>
+        <p className="text-sm text-zinc-400">{player.rating}</p>
       </div>
       <div className="text-zinc-400">›</div>
     </button>

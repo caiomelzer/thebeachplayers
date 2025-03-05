@@ -18,7 +18,7 @@ const PlayerProfile = () => {
     isLoading, 
     error 
   } = useQuery({
-    queryKey: ['player', modalityId, id],
+    queryKey: ['players', modalityId, id],
     queryFn: () => id ? fetchPlayerDetail(modalityId, id) : Promise.reject(new Error("ID não fornecido")),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
@@ -29,11 +29,10 @@ const PlayerProfile = () => {
       }
     }
   });
-
   if (isLoading) return <p className="text-center text-white">Carregando...</p>;
   if (error) return <p className="text-center text-red-500">{(error as Error).message}</p>;
   if (!player) return <p className="text-center text-white">Nenhuma informação disponível.</p>;
-
+  console.log('player:', player);
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="p-6">
@@ -45,8 +44,8 @@ const PlayerProfile = () => {
             alt="Profile"
             className="w-24 h-24 rounded-full mb-4 object-cover"
           />
-          <h1 className="text-2xl font-bold">{player.name}</h1>
-          <p className="text-zinc-400 mb-4">{player.player_id || `#${player.id.substring(0, 6)}`}</p>
+          <h1 className="text-2xl font-bold">{player.full_name}</h1>
+          <p className="text-zinc-400 mb-4">({player.nickname})</p>
           
           <div className="flex gap-4 text-sm mb-6">
             {player.sports && player.sports.length > 0 ? (
@@ -71,26 +70,26 @@ const PlayerProfile = () => {
             <div className="bg-zinc-900 rounded-lg p-4">
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg">Ranking Geral</h2>
-                <span className="text-[#0EA5E9] text-xl font-bold">{player.ranking || "#00178"}</span>
+                <span className="text-[#0EA5E9] text-xl font-bold">#{player.ranking.toString().padStart(5, '0')}</span>
               </div>
-              <p className="text-sm text-zinc-400">{player.rankingChange || "Subiu 36 posições no último mês"}</p>
+              
             </div>
 
             <div className="bg-zinc-900 rounded-lg p-4">
               <h2 className="text-lg mb-2">Categoria Mínima Permitida</h2>
-              <p className="text-[#0EA5E9] font-bold mb-1">{player.minCategory || "Intermediário"}</p>
-              <p className="text-sm text-zinc-400">ou score mínimo {player.minScore || "1000"} pontos</p>
+              <p className="text-[#0EA5E9] font-bold mb-1">{player.minCategory || "Estreante"}</p>
+              <p className="text-sm text-zinc-400">ou score mínimo {player.minScore || "0"} pontos</p>
             </div>
 
             <div className="bg-zinc-900 rounded-lg p-4">
               <h2 className="text-lg mb-4">Campeonatos Disputados</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-4xl font-bold">{player.recent_championships || "51"}</p>
+                  <p className="text-4xl font-bold">{player.statistics.total_championships_last_6_months || "51"}</p>
                   <p className="text-sm text-zinc-400">nos últimos 6 meses</p>
                 </div>
                 <div>
-                  <p className="text-4xl font-bold">{player.total_championships || "100"}</p>
+                  <p className="text-4xl font-bold">{player.statistics.total_championships || "100"}</p>
                   <p className="text-sm text-zinc-400">desde que se cadastrou</p>
                 </div>
               </div>
@@ -99,13 +98,13 @@ const PlayerProfile = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-zinc-900 rounded-lg p-4">
                 <h2 className="text-lg mb-4">Vitórias</h2>
-                <p className="text-4xl font-bold">{player.victories || "19"}</p>
+                <p className="text-4xl font-bold">{player.statistics.wins || "0"}</p>
                 <p className="text-sm text-zinc-400">Vitórias</p>
               </div>
 
               <div className="bg-zinc-900 rounded-lg p-4">
                 <h2 className="text-lg mb-4">Derrotas</h2>
-                <p className="text-4xl font-bold">{player.defeats || "32"}</p>
+                <p className="text-4xl font-bold">{player.statistics.losses || "0"}</p>
                 <p className="text-sm text-zinc-400">Derrotas</p>
               </div>
             </div>
