@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { fetchArenas } from "./arenas/services/arenaService";
+import { fetchChampionships } from "./championships/services/championshipService";
+
+import Championship from "./Championship";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -18,6 +21,8 @@ const Home = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false
   });
+
+  
 
   // Calculate nearby arenas when we have user location
   useEffect(() => {
@@ -55,6 +60,8 @@ const Home = () => {
   console.log(user)
   const ranking = user?.ranking || 0;
   const countPlayers = 0;
+  const championships = 12;
+  const players = 333;
   // Get user statistics with default values
   const stats = user?.statistics || {
     ranking: 0,
@@ -136,7 +143,7 @@ const Home = () => {
                 <p className="text-sm text-zinc-400">Campeonatos</p>
                 <p className="font-medium">Disponíveis</p>
               </div>
-              <span className="text-[#0EA5E9] text-2xl font-bold">13</span>
+              <span className="text-[#0EA5E9] text-2xl font-bold">{championships}</span>
             </div>
           </button>
 
@@ -171,7 +178,7 @@ const Home = () => {
                 <p className="text-sm text-zinc-400">Jogadores</p>
                 <p className="font-medium">Vôlei</p>
               </div>
-              <span className="text-green-500 text-2xl font-bold">324</span>
+              <span className="text-green-500 text-2xl font-bold">{players}</span>
             </div>
           </button>
 

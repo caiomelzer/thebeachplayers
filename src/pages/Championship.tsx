@@ -50,7 +50,6 @@ const Championship = () => {
             className="w-24 h-24 rounded-full mx-auto mb-4"
           />
           <h1 className="text-2xl font-bold mb-1">{championship.title}</h1>
-          <p className="text-sm text-zinc-400">#{championship.id.substring(0, 6)}</p>
           <h2 className="text-xl font-bold text-[#0EA5E9] mt-4">{championship.category}</h2>
         </div>
 
@@ -60,7 +59,7 @@ const Championship = () => {
           <div className="bg-zinc-900 rounded-lg p-4">
             <h3 className="font-medium mb-2">Sobre</h3>
             <p className="text-sm text-zinc-400">
-              {championship.description || "Mais uma etapa do famoso campeonato do beto e da Rai.Mais uma etapa do famoso campeonato do beto e da Rai.Mais uma etapa do famoso campeonato do beto e da Rai.Mais uma etapa do famoso campeonato do beto e da Rai."}
+              {championship.description || "Sem informações por enquanto."}
             </p>
           </div>
 
@@ -68,9 +67,10 @@ const Championship = () => {
           <div className="bg-zinc-900 rounded-lg p-4">
             <h3 className="font-medium mb-2">Local e Data</h3>
             <p className="text-[#0EA5E9] mb-2">
-              {new Date(championship.occurs || championship.date || "").toLocaleDateString('pt-BR')} às {new Date(championship.occurs || championship.date || "").toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              {new Date(championship.occurs).toLocaleDateString('pt-BR')} às {new Date(championship.occurs).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
             </p>
             <p className="text-sm text-zinc-400">
+              {championship.arena_id }
               {championship.arena_name || "Arena JR10"}
               <br />
               {championship.arena_address || "Rua Antônio Mariano, 137 Jardim Ipanema - Interlagos, São Paulo - SP, 04784-000"}
