@@ -23,16 +23,18 @@ const ArenaDetails = () => {
     queryFn: () => id ? fetchArenaDetail(id) : Promise.reject(new Error("ID não fornecido")),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
-    onError: (error) => {
-      console.error("Error fetching arena details:", error);
-      toast.error("Erro ao buscar detalhes da arena");
+    meta: {
+      onError: (error: Error) => {
+        console.error("Error fetching arena details:", error);
+        toast.error("Erro ao buscar detalhes da arena");
+      }
     }
   });
 
   if (isLoading) return <p className="text-center text-white">Carregando...</p>;
   if (error) return <p className="text-center text-red-500">{(error as Error).message}</p>;
   if (!arena) return <p className="text-center text-white">Nenhuma informação disponível.</p>;
-console.log('arena:', arena, arena.images);
+  console.log('arena:', arena, arena.images);
 
   return (
     <div className="min-h-screen bg-black text-white">

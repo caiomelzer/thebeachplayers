@@ -25,9 +25,11 @@ const Championships = () => {
     queryFn: () => fetchChampionships(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
-    onError: (error) => {
-      console.error("Error fetching championships:", error);
-      toast.error("Erro ao buscar campeonatos");
+    meta: {
+      onError: (error: Error) => {
+        console.error("Error fetching championships:", error);
+        toast.error("Erro ao buscar campeonatos");
+      }
     }
   });
 

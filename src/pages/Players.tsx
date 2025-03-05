@@ -1,146 +1,95 @@
 
-import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
+
+import { fetchPlayers } from "./players/services/playerService";
+import { PlayerHeader } from "./players/components/PlayerHeader";
+import { PlayerSearchBar } from "./players/components/PlayerSearchBar";
+import { PlayerFilters } from "./players/components/PlayerFilters";
+import { PlayerCard } from "./players/components/PlayerCard";
 
 type Sport = 'volei' | 'futvolei' | 'beachtennis';
-
-interface Player {
-  id: number;
-  nickname: string;
-  name: string;
-  category: string;
-  avatar: string;
-  sport: Sport;
-}
 
 const Players = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<Sport>('volei');
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Hardcoded modality ID as specified
+  const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e";
 
-  const players: Player[] = [
-    {
-      id: 1,
-      nickname: "Klebinho",
-      name: "Kleber Utrilha",
-      category: "Intermediário",
-      avatar: "/lovable-uploads/kleber.png",
-      sport: "volei"
-    },
-    {
-      id: 2,
-      nickname: "Bruxo",
-      name: "Ronaldinho Gaúcho",
-      category: "Iniciante",
-      avatar: "/lovable-uploads/ronaldinho.png",
-      sport: "volei"
-    },
-    {
-      id: 3,
-      nickname: "MariaS",
-      name: "Maria Silva",
-      category: "Avançado",
-      avatar: "/lovable-uploads/6e0fd4b5-bb25-459b-a6d4-dd1554ad50ec.png",
-      sport: "volei"
+  const { 
+    data: players = [], 
+    isLoading, 
+    error 
+  } = useQuery({
+    queryKey: ['players', modalityId],
+    queryFn: () => fetchPlayers(modalityId),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    meta: {
+      onError: (error: Error) => {
+        console.error("Error fetching players:", error);
+        toast.error("Erro ao buscar jogadores");
+      }
     }
-  ];
+  });
 
   const filterPlayers = () => {
-    let filtered = players;
-
+    if (!players || players.length === 0) return [];
+    
+    let filtered = [...players];
+    
     // Apply search filter
     if (searchTerm) {
+      const lowercaseSearchTerm = searchTerm.toLowerCase();
       filtered = filtered.filter(player =>
-        player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        player.nickname.toLowerCase().includes(searchTerm.toLowerCase())
+        player.name.toLowerCase().includes(lowercaseSearchTerm) ||
+        player.nickname.toLowerCase().includes(lowercaseSearchTerm)
       );
     }
-
-    // Apply sport filter
-    filtered = filtered.filter(player => player.sport === activeFilter);
-
+    
+    // In the future, we might apply sport filter here
+    // For now, we're using a hardcoded modality ID
+    
     return filtered;
   };
 
   const filteredPlayers = filterPlayers();
 
+  if (isLoading) return <p className="text-center text-white">Carregando...</p>;
+  if (error) return <p className="text-center text-red-500">{(error as Error).message}</p>;
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button 
-            onClick={() => navigate('/home')}
-            className="bg-[#0EA5E9] p-2 rounded-lg"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-xl font-bold flex-1 text-center">Jogadores</h1>
-          <div className="w-8"></div>
-        </div>
+        <PlayerHeader onBackClick={() => navigate('/home')} />
+        
+        <PlayerSearchBar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+        />
+        
+        <PlayerFilters
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+        />
 
-        {/* Search Bar */}
-        <div className="mb-6">
-          <input
-            type="text"
-            placeholder="Buscar"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-zinc-900 text-white px-4 py-3 rounded-lg"
-          />
-        </div>
+        {filteredPlayers.length === 0 && (
+          <div className="text-center py-8 text-zinc-400">
+            Nenhum jogador encontrado
+          </div>
+        )}
 
-        {/* Filters */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          <button 
-            onClick={() => setActiveFilter('volei')}
-            className={`px-4 py-2 rounded-full text-center ${
-              activeFilter === 'volei' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
-            }`}
-          >
-            Vôlei
-          </button>
-          <button 
-            onClick={() => setActiveFilter('futvolei')}
-            className={`px-4 py-2 rounded-full text-center ${
-              activeFilter === 'futvolei' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
-            }`}
-          >
-            FutVôlei
-          </button>
-          <button 
-            onClick={() => setActiveFilter('beachtennis')}
-            className={`px-4 py-2 rounded-full text-center ${
-              activeFilter === 'beachtennis' ? 'bg-[#0EA5E9] text-white' : 'bg-zinc-900 text-zinc-400'
-            }`}
-          >
-            Beach Tennis
-          </button>
-        </div>
-
-        {/* Players List */}
         <div className="space-y-4">
           {filteredPlayers.map((player) => (
-            <button
+            <PlayerCard
               key={player.id}
-              className="w-full bg-zinc-900 rounded-lg p-4 flex items-center text-left"
-              onClick={() => navigate(`/player/${player.id}`)}
-            >
-              <div className="mr-4">
-                <img
-                  src={player.avatar}
-                  alt={`${player.nickname}'s avatar`}
-                  className="w-12 h-12 rounded-full"
-                />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium">{player.nickname}</h3>
-                <p className="text-sm text-zinc-400">{player.name}</p>
-                <p className="text-sm text-zinc-400">{player.category}</p>
-              </div>
-              <div className="text-zinc-400">›</div>
-            </button>
+              player={player}
+              onClick={(id) => navigate(`/player/${id}`)}
+            />
           ))}
         </div>
       </div>
