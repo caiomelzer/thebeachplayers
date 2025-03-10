@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '@/integrations/api/client';
-import type { User, PlayerStatistics } from '@/types/database';
+import type { User, PlayerStatistics, UserModality } from '@/types/database';
 
 interface AuthContextType {
   user: User | null;

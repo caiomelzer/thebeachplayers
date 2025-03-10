@@ -32,4 +32,5 @@ export type User = {
   ranking?: number;
   rating?: number;
   statistics?: PlayerStatistics;
+  modalities?: UserModality[];
 }

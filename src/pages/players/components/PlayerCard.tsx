@@ -6,6 +6,7 @@ interface Player {
   name: string;
   rating: string;
   avatar_url: string;
+  whatsapp?: string;
 }
 
 interface PlayerCardProps {
@@ -14,8 +15,6 @@ interface PlayerCardProps {
 }
 
 export const PlayerCard = ({ player, onClick }: PlayerCardProps) => {
-  console.log('PlayerCard render');
-  console.log('player:', player);
   return (
     <button
       key={player.id}

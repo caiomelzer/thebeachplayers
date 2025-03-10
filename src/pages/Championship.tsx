@@ -1,21 +1,27 @@
 
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { fetchChampionshipDetail } from "./championships/services/championshipDetailService";
-import { fetchArenaDetail } from "./arenas/services/arenaDetailService"
+import { fetchArenaDetail } from "./arenas/services/arenaDetailService";
 import { ChampionshipDetailHeader } from "./championships/components/ChampionshipDetailHeader";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+
 const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e"; // Hardcoded modality ID
 
 const Championship = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { 
     data: championship, 
     isLoading, 
-    error 
+    error,
+    refetch
   } = useQuery({
     queryKey: ['championship', id],
     queryFn: () => id ? fetchChampionshipDetail(id, modalityId) : Promise.reject(new Error("ID não fornecido")),
@@ -29,32 +35,42 @@ const Championship = () => {
     }
   });
 
-  
-
-
-
-  console.log('championship:', championship);
-
   const { 
     data: arena
   } = useQuery({
-    queryKey: ['arena', id],
-    queryFn: () => id ? fetchArenaDetail(championship.arena_id) : Promise.reject(new Error("ID não fornecido")),
+    queryKey: ['arena', championship?.arena_id],
+    queryFn: () => championship?.arena_id ? fetchArenaDetail(championship.arena_id) : Promise.reject(new Error("ID da arena não fornecido")),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
+    enabled: !!championship?.arena_id,
     meta: {
       onError: (error: Error) => {
-        console.error("Error fetching championship details:", error);
-        toast.error("Erro ao buscar detalhes do campeonato");
+        console.error("Error fetching arena details:", error);
+        toast.error("Erro ao buscar detalhes da arena");
       }
     }
   });
 
-  console.log('arena:', arena);
+  // Check if current user is already registered in this championship
+  const isUserRegistered = (): boolean => {
+    if (!user || !championship?.teams) return false;
+    
+    return championship.teams.some(team => {
+      return team.members?.some(member => member.player_id === user.id);
+    });
+  };
 
-  const handlePriceClick = () => {
-    const message = encodeURIComponent(`Olá, gostaria de inscrever no campeonato ${championship.title}.`);
-    window.open(`https://wa.me/55${championship.contact}?text=${message}`, '_blank');
+  const handleRegisterClick = () => {
+    if (isUserRegistered()) {
+      toast.info("Você já está inscrito neste campeonato");
+      return;
+    }
+    
+    navigate(`/create-team/${id}`, { 
+      state: { 
+        championshipData: championship 
+      } 
+    });
   };
 
   if (isLoading) return <p className="text-center text-white">Carregando...</p>;
@@ -92,7 +108,6 @@ const Championship = () => {
           <div className="bg-zinc-900 rounded-lg p-4">
             <h3 className="font-medium mb-2">Local e Data</h3>
             <p className="text-[#0EA5E9] mb-2">
-              
               {new Date(championship.occurs).toLocaleDateString('pt-BR')} às {new Date(championship.occurs).toISOString().replace('T', ' ').substring(10, 16)}
             </p>
             <p className="text-sm text-zinc-400">
@@ -113,9 +128,10 @@ const Championship = () => {
               <p className="text-sm text-zinc-400">Vagas disp.</p>
             </div>
           </div>
+          
           {/* Rules Button */}
           <button 
-            onClick={() => navigate(`/championship/${id}/`)}
+            onClick={() => navigate(`/championship/${id}/rules`)}
             className="w-full bg-zinc-900 rounded-lg p-4 text-left "
           >
             <p className="text-center">Clique aqui para ler as regras (Em breve)</p>
@@ -124,13 +140,14 @@ const Championship = () => {
           {/* Pricing */}
           <div className="space-y-3">
             <h3 className="text-zinc-400">Valores</h3>
-            <button 
-              onClick={handlePriceClick}
+            <Button 
+              onClick={handleRegisterClick}
               className="w-full bg-zinc-900 rounded-lg p-4 flex justify-between items-center"
+              disabled={isUserRegistered()}
             >
               <span>Inscrição por pessoa</span>
               <span className="text-[#0EA5E9]">R${championship.price}</span>
-            </button>
+            </Button>
           </div>
           
           {/* Participants List */}

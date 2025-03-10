@@ -23,6 +23,8 @@ import Players from "./pages/Players";
 import PlayerProfile from "./pages/PlayerProfile";
 import Arenas from "./pages/Arenas";
 import ArenaDetails from "./pages/ArenaDetails";
+import CreateTeam from "./pages/CreateTeam";
+import SelectPlayer from "./pages/SelectPlayer";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +49,8 @@ const App = () => (
             <Route path="/championships" element={<ProtectedRoute><Championships /></ProtectedRoute>} />
             <Route path="/championship/:id" element={<ProtectedRoute><Championship /></ProtectedRoute>} />
             <Route path="/championship/:id/rules" element={<ProtectedRoute><ChampionshipRules /></ProtectedRoute>} />
+            <Route path="/create-team/:id" element={<ProtectedRoute><CreateTeam /></ProtectedRoute>} />
+            <Route path="/select-player" element={<ProtectedRoute><SelectPlayer /></ProtectedRoute>} />
             <Route path="/players" element={<ProtectedRoute><Players /></ProtectedRoute>} />
             <Route path="/player/:id" element={<ProtectedRoute><PlayerProfile /></ProtectedRoute>} />
             <Route path="/complaint" element={<ProtectedRoute><Complaint /></ProtectedRoute>} />
