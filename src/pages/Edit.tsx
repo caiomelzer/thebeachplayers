@@ -62,6 +62,7 @@ const Edit = () => {
       toast.error('Erro ao atualizar a foto');
     } finally {
       setIsLoading(false);
+      window.location.reload();
     }
   };
 
@@ -116,7 +117,7 @@ const Edit = () => {
         <div className="flex flex-col items-center mb-6">
           <div className="relative">
             <img
-              src={'http://143.198.75.127:3000'+user?.avatar_url || "/lovable-uploads/avatar.png"}
+              src={user?.avatar_url || "http://thebeachplayers.com/lovable-uploads/avatar.png"}
               alt="Profile"
               className="w-24 h-24 rounded-full mb-4 cursor-pointer"
               onClick={handleAvatarClick}

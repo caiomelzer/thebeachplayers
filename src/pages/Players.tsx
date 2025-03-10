@@ -71,11 +71,11 @@ const Players = () => {
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
         />
-        
+{/* 
         <PlayerFilters
           activeFilter={activeFilter}
           onFilterChange={setActiveFilter}
-        />
+        />COMENTÁRIO JSX */}
 
         {filteredPlayers.length === 0 && (
           <div className="text-center py-8 text-zinc-400">

@@ -28,6 +28,7 @@ export const ChampionshipCard = ({ championship, onClick }: ChampionshipCardProp
     return `${day}/${month}/${year.slice(2)}`;
   };
 
+  console.log(championship)
   return (
     <button
       className="w-full bg-zinc-900 rounded-lg p-4 flex items-center text-left"
@@ -44,10 +45,10 @@ export const ChampionshipCard = ({ championship, onClick }: ChampionshipCardProp
       <div className="flex-1">
         <h3 className="font-medium">{championship.title}</h3>
         <p className="text-sm text-zinc-400">
-          {formatDisplayDate(championship.occurs || championship.date || "")} - {championship.category}
+          {championship.gender} - {championship.category}
         </p>
         <p className={`text-sm ${championship.isDisabled ? 'text-red-500' : 'text-zinc-400'}`}>
-          {championship.status || championship.price}
+        {formatDisplayDate(championship.occurs)} - {championship.status || championship.price}
         </p>
       </div>
       <div className="text-zinc-400">›</div>

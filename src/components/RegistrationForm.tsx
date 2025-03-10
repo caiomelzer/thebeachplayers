@@ -135,7 +135,7 @@ export const RegistrationForm = () => {
       <RegisterInput
         id="cpf"
         label="CPF"
-        type="text"
+        type="number"
         value={formData.cpf}
         onChange={(value) => handleInputChange('cpf', value)}
         error={errors.cpf}

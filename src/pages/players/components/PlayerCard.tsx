@@ -30,8 +30,8 @@ export const PlayerCard = ({ player, onClick }: PlayerCardProps) => {
         />
       </div>
       <div className="flex-1">
-        <h3 className="font-medium">{player.nickname} <span className="text-sm text-zinc-400">({player.full_name})</span></h3>
-        <p className="text-sm text-zinc-400">{player.rating}</p>
+        <h3 className="font-medium">{player.nickname} <span className="text-sm text-zinc-400">{player.full_name ? `(${player.full_name})` : ""}</span></h3>
+        <p className="text-sm text-zinc-400">Ranking: {player.rating} | Score: {player.rating}</p>
       </div>
       <div className="text-zinc-400">›</div>
     </button>

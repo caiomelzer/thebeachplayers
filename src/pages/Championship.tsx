@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { fetchChampionshipDetail } from "./championships/services/championshipDetailService";
+import { fetchArenaDetail } from "./arenas/services/arenaDetailService"
 import { ChampionshipDetailHeader } from "./championships/components/ChampionshipDetailHeader";
 const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e"; // Hardcoded modality ID
 
@@ -27,10 +28,32 @@ const Championship = () => {
       }
     }
   });
+
+  
+
+
+
   console.log('championship:', championship);
 
+  const { 
+    data: arena
+  } = useQuery({
+    queryKey: ['arena', id],
+    queryFn: () => id ? fetchArenaDetail(championship.arena_id) : Promise.reject(new Error("ID não fornecido")),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    meta: {
+      onError: (error: Error) => {
+        console.error("Error fetching championship details:", error);
+        toast.error("Erro ao buscar detalhes do campeonato");
+      }
+    }
+  });
+
+  console.log('arena:', arena);
+
   const handlePriceClick = () => {
-    const message = encodeURIComponent("Olá, gostaria de mais informações sobre os valores do campeonato.");
+    const message = encodeURIComponent(`Olá, gostaria de inscrever no campeonato ${championship.title}.`);
     window.open(`https://wa.me/55${championship.contact}?text=${message}`, '_blank');
   };
 
@@ -73,10 +96,9 @@ const Championship = () => {
               {new Date(championship.occurs).toLocaleDateString('pt-BR')} às {new Date(championship.occurs).toISOString().replace('T', ' ').substring(10, 16)}
             </p>
             <p className="text-sm text-zinc-400">
-              {championship.arena_id }
-              {championship.arena_name || "Arena JR10"}
+              {arena ? arena.name : ""}
               <br />
-              {championship.arena_address || "Rua Antônio Mariano, 137 Jardim Ipanema - Interlagos, São Paulo - SP, 04784-000"}
+              {arena ? arena.address : ""}
             </p>
           </div>
 

@@ -85,11 +85,11 @@ const PlayerProfile = () => {
               <h2 className="text-lg mb-4">Campeonatos Disputados</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-4xl font-bold">{player.statistics.total_championships_last_6_months || "51"}</p>
+                  <p className="text-4xl font-bold">{player.statistics.total_championships_last_6_months || "0"}</p>
                   <p className="text-sm text-zinc-400">nos últimos 6 meses</p>
                 </div>
                 <div>
-                  <p className="text-4xl font-bold">{player.statistics.total_championships || "100"}</p>
+                  <p className="text-4xl font-bold">{player.statistics.total_championships || "0"}</p>
                   <p className="text-sm text-zinc-400">desde que se cadastrou</p>
                 </div>
               </div>

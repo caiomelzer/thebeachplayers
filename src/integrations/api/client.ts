@@ -1,7 +1,7 @@
 
 import axios from 'axios';
 
-export const API_URL = 'http://143.198.75.127:3000';
+export const API_URL = 'https://thebeachplayers.com';
 
 export const apiClient = axios.create({
   baseURL: API_URL,

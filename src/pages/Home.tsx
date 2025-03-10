@@ -84,7 +84,7 @@ const Home = () => {
   };
 
   // Get the display name from user data, fallback to 'Usuário'
-  const displayName = user?.full_name || user?.nickname || 'Usuário';
+  const displayName = user?.nickname || user?.full_name || '';
   const ranking = user?.ranking || 0;
   
   // Use the count from the API responses
@@ -128,12 +128,12 @@ const Home = () => {
         <h1 className="text-4xl font-bold mb-1">Olá</h1>
         <h2 className="text-4xl font-bold mb-4">{displayName}</h2>
         
-        {/* Sport Tags */}
+        {/* 
         <div className="flex gap-4 text-sm">
           <span className="bg-[#0EA5E9] px-4 py-1 rounded-full">Vôlei</span>
           <span className="bg-zinc-800/50 text-zinc-400 px-4 py-1 rounded-full">FutVôlei</span>
           <span className="bg-zinc-800/50 text-zinc-400 px-4 py-1 rounded-full">Beach Tennis</span>
-        </div>
+        </div>Sport Tags */}
       </div>
 
       {/* Ranking Card */}
