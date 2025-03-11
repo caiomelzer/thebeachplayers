@@ -8,6 +8,8 @@ import { fetchArenaDetail } from "./arenas/services/arenaDetailService";
 import { ChampionshipDetailHeader } from "./championships/components/ChampionshipDetailHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { fetchChampionshipTeams } from "./championships/services/championshipDetailService";
+import { Team } from "@/types/database";
 
 const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e"; // Hardcoded modality ID
 
@@ -51,12 +53,29 @@ const Championship = () => {
     }
   });
 
+  // Fetch teams for this championship
+  const {
+    data: teams,
+    isLoading: isLoadingTeams
+  } = useQuery({
+    queryKey: ['championship-teams', id],
+    queryFn: () => id ? fetchChampionshipTeams(modalityId, id) : Promise.reject(new Error("ID não fornecido")),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    meta: {
+      onError: (error: Error) => {
+        console.error("Error fetching championship teams:", error);
+        toast.error("Erro ao buscar times do campeonato");
+      }
+    }
+  });
+
   // Check if current user is already registered in this championship
   const isUserRegistered = (): boolean => {
-    if (!user || !championship?.teams) return false;
+    if (!user || !teams) return false;
     
-    return championship.teams.some(team => {
-      return team.members?.some(member => member.player_id === user.id);
+    return teams.some(team => {
+      return team.team_members?.some(member => member.player_id === user.id);
     });
   };
 
@@ -152,34 +171,48 @@ const Championship = () => {
           
           {/* Participants List */}
           <div className="space-y-3 pb-6">
-            <h3 className="text-zinc-400">Participantes ({championship.registered_teams_count || 0} inscritos)</h3>
-            {(championship.teams || []).map((team, i) => (
-              <button
-                key={team.id || i}
-                onClick={() => navigate('/complaint')}
-                className="w-full bg-zinc-900 rounded-lg p-4 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="flex -space-x-2">
-                    <img
-                      src={team.player1_avatar || "/lovable-uploads/kleber.png"}
-                      alt="Player 1"
-                      className="w-8 h-8 rounded-full border-2 border-black"
-                    />
-                    <img
-                      src={team.player2_avatar || "/lovable-uploads/ronaldinho.png"}
-                      alt="Player 2"
-                      className="w-8 h-8 rounded-full border-2 border-black"
-                    />
+            <h3 className="text-zinc-400">Participantes ({teams?.length || 0} inscritos)</h3>
+            
+            {isLoadingTeams ? (
+              <p className="text-center text-zinc-400 py-4">Carregando times...</p>
+            ) : teams && teams.length > 0 ? (
+              teams.map((team) => (
+                <button
+                  key={team.id}
+                  onClick={() => navigate('/complaint')}
+                  className="w-full bg-zinc-900 rounded-lg p-4 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
+                      {team.team_members && team.team_members.length > 0 && (
+                        <>
+                          <img
+                            src={team.team_members[0]?.avatar_url || "/placeholder.svg"}
+                            alt="Player 1"
+                            className="w-8 h-8 rounded-full border-2 border-black"
+                          />
+                          {team.team_members.length > 1 && (
+                            <img
+                              src={team.team_members[1]?.avatar_url || "/placeholder.svg"}
+                              alt="Player 2"
+                              className="w-8 h-8 rounded-full border-2 border-black"
+                            />
+                          )}
+                        </>
+                      )}
+                    </div>
+                    <div>
+                      {team.team_members && team.team_members.map((member, index) => (
+                        <p key={index}>{member.nickname || "Jogador sem nome"}</p>
+                      ))}
+                    </div>
                   </div>
-                  <div>
-                    <p>{team.player1_name || "Kleber Utrilha"}</p>
-                    <p>{team.player2_name || "Ronaldinho Gaúcho"}</p>
-                  </div>
-                </div>
-                <div className="text-zinc-400">!</div>
-              </button>
-            ))}
+                  <div className="text-zinc-400">!</div>
+                </button>
+              ))
+            ) : (
+              <p className="text-center text-zinc-400 py-4">Nenhum time inscrito ainda</p>
+            )}
           </div>
         </div>
       </div>
