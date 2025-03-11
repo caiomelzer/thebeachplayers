@@ -33,4 +33,22 @@ export type User = {
   rating?: number;
   statistics?: PlayerStatistics;
   modalities?: UserModality[];
+  name?: string; // Added for compatibility with player API response
+  whatsapp?: string; // Added for team creation
+}
+
+export type TeamMember = {
+  player_id: string;
+  nickname?: string;
+  avatar_url?: string;
+  rating?: string;
+  whatsapp?: string;
+}
+
+export type Team = {
+  id: string;
+  championship_id: string;
+  team_members: TeamMember[];
+  created_at: string;
+  updated_at: string;
 }

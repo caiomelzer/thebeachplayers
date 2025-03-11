@@ -58,13 +58,15 @@ const SelectPlayer = () => {
   };
 
   const handleSelectPlayer = (playerId: string) => {
-    if (!teamMemberIndex && teamMemberIndex !== 0) {
+    if (teamMemberIndex === undefined) {
       toast.error("Erro ao selecionar jogador");
       return;
     }
 
     const selectedPlayer = players.find(player => player.id === playerId);
     if (!selectedPlayer) return;
+
+    console.log("Selected player:", selectedPlayer);
 
     // Create a copy of team members and update the selected index
     const updatedTeamMembers = [...teamMembers];
@@ -76,8 +78,10 @@ const SelectPlayer = () => {
       whatsapp: selectedPlayer.whatsapp || "",
     };
 
+    console.log("Updated team members:", updatedTeamMembers);
+
     // Navigate back to team creation page with updated data
-    navigate("/create-team/" + championshipId, { 
+    navigate(`/create-team/${championshipId}`, { 
       state: { 
         teamMembers: updatedTeamMembers,
         championshipData

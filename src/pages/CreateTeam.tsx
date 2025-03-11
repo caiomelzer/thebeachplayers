@@ -1,22 +1,11 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/integrations/api/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Plus, User } from "lucide-react";
-
-type Player = {
-  id: string;
-  nickname: string;
-  full_name: string;
-  name: string;
-  rating: string;
-  avatar_url: string;
-  whatsapp?: string;
-};
+import { ArrowLeft, User } from "lucide-react";
 
 type TeamMember = {
   player_id: string;
@@ -36,16 +25,23 @@ const CreateTeam = () => {
   const { id: championshipId } = useParams();
   const location = useLocation();
   const { user } = useAuth();
-  const championshipData = location.state?.championshipData || {};
   
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  // Get data from location state or use defaults
+  const championshipData = location.state?.championshipData || {};
+  const initialTeamMembers = location.state?.teamMembers || [];
+  
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Initialize team with current user
+  // Initialize team with current user if no team members provided
   useEffect(() => {
-    if (user) {
+    console.log("Location state:", location.state);
+    console.log("Initial team members:", initialTeamMembers);
+    
+    // Only initialize if we don't have team members from state
+    if (initialTeamMembers.length === 0 && user) {
       // First slot is always the current user
-      setTeamMembers([
+      const newTeamMembers = [
         {
           player_id: user.id,
           nickname: user.nickname || "Usuário",
@@ -53,7 +49,7 @@ const CreateTeam = () => {
           rating: user.rating?.toString(),
           whatsapp: "", // We don't have this in our user type yet
         },
-      ]);
+      ];
       
       // Add empty slots based on championship requirements
       const requiredPlayers = championshipData.players_per_team || 2;
@@ -68,12 +64,15 @@ const CreateTeam = () => {
           whatsapp: "",
         }));
         
-        setTeamMembers(prev => [...prev, ...emptySlotsArray]);
+        setTeamMembers([...newTeamMembers, ...emptySlotsArray]);
+      } else {
+        setTeamMembers(newTeamMembers);
       }
     }
-  }, [user, championshipData]);
+  }, [user, championshipData, initialTeamMembers]);
 
   const handleSelectPlayer = (index: number) => {
+    console.log("Selecting player for index:", index);
     navigate("/select-player", { 
       state: { 
         teamMemberIndex: index,
@@ -99,6 +98,8 @@ const CreateTeam = () => {
         championship_id: championshipId || "",
         team_members: teamMembers,
       };
+
+      console.log("Submitting team data:", teamData);
 
       // Send the team registration to the API
       const response = await apiClient.post(`/api/championships/${championshipId}/teams`, teamData);

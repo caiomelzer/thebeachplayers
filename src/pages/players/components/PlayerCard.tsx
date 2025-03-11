@@ -1,4 +1,6 @@
 
+import { User } from "@/types/database";
+
 interface Player {
   id: string;
   nickname: string;
