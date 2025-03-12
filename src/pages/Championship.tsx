@@ -69,6 +69,12 @@ const Championship = () => {
       }
     }
   });
+  if(teams) { 
+    teams.map((team) => (
+      console.log('team:',  team)
+    ));
+  }
+  
 
   // Check if current user is already registered in this championship
   const isUserRegistered = (): boolean => {
@@ -179,35 +185,29 @@ const Championship = () => {
               teams.map((team) => (
                 <button
                   key={team.id}
-                  onClick={() => navigate('/complaint')}
-                  className="w-full bg-zinc-900 rounded-lg p-4 flex items-center justify-between"
+                  onClick={() => navigate('/complaint/')}
+                  className="w-full bg-zinc-900 rounded-lg p-4 flex items-center justify-between " 
                 >
                   <div className="flex items-center gap-2">
                     <div className="flex -space-x-2">
-                      {team.team_members && team.team_members.length > 0 && (
-                        <>
+                      {team && team.length > 0 && (
+                        team.map((player, index) => (
                           <img
-                            src={team.team_members[0]?.avatar_url || "/placeholder.svg"}
+                            key={index}
+                            src={player.avatar_url || "/placeholder.svg"}
                             alt="Player 1"
                             className="w-8 h-8 rounded-full border-2 border-black"
                           />
-                          {team.team_members.length > 1 && (
-                            <img
-                              src={team.team_members[1]?.avatar_url || "/placeholder.svg"}
-                              alt="Player 2"
-                              className="w-8 h-8 rounded-full border-2 border-black"
-                            />
-                          )}
-                        </>
+                        ))
                       )}
                     </div>
                     <div>
-                      {team.team_members && team.team_members.map((member, index) => (
-                        <p key={index}>{member.nickname || "Jogador sem nome"}</p>
+                      {team && team.map((member) => (
+                        <p class="text-sm text-zinc-400">{member.nickname || "Jogador sem nome"} ({member.fullname || "Jogador sem nome"})</p>
                       ))}
                     </div>
                   </div>
-                  <div className="text-zinc-400">!</div>
+                  <div className="text-zinc-400">›</div>
                 </button>
               ))
             ) : (
