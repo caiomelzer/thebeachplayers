@@ -26,7 +26,7 @@ const Complaint = () => {
   const championshipId = state?.championshipId;
   
   const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e"; // Hardcoded modality ID
-
+  console.log('championship:', team);
   const handleWrongCategory = async () => {
     if (!user) {
       toast.error('Você precisa estar logado para fazer uma denúncia');
@@ -37,6 +37,7 @@ const Complaint = () => {
       toast.error('Dados do time ou campeonato não encontrados');
       return;
     }
+    
 
     try {
       setIsSubmitting(true);
@@ -54,9 +55,9 @@ const Complaint = () => {
       
       // Send WhatsApp message
       const message = encodeURIComponent(
-        `Olá, gostaria de reportar uma categoria incorreta no campeonato ${championship?.title || ''} (ID: ${championshipId}).`
+        `Olá, gostaria de reportar uma categoria incorreta no campeonato ${championship?.title || ''} (ID: ${championshipId}) sobre o time ${team[0].team}.`
       );
-      window.open(`https://wa.me/5511980872469?text=${message}`, '_blank');
+      window.open(`https://wa.me/55${contact}?text=${message}`, '_blank');
 
       toast.success('Denúncia enviada com sucesso!');
     } catch (error) {
@@ -112,7 +113,7 @@ const Complaint = () => {
           </p>
 
           <div className="space-y-4 mb-8">
-            <h2 className="text-lg font-medium text-left">Integrantes</h2>
+            <h2 className="text-lg font-medium text-left">Time</h2>
             {team && team.map((member, index) => (
               <div
                 key={index}
