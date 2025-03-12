@@ -191,8 +191,8 @@ const Championship = () => {
                 >
                   <div className="flex items-center gap-2">
                     <div className="flex -space-x-2">
-                      {team.team_members && team.team_members.length > 0 && (
-                        team.team_members.map((member, index) => (
+                      {team && team.length > 0 && (
+                        team.map((member, index) => (
                           <img
                             key={index}
                             src={member.avatar_url || "/placeholder.svg"}
@@ -203,8 +203,8 @@ const Championship = () => {
                       )}
                     </div>
                     <div>
-                      {team.team_members && team.team_members.map((member, index) => (
-                        <p key={index} className="text-sm text-zinc-400">{member.nickname || "Jogador sem nome"}</p>
+                      {team && team.map((member, index) => (
+                        <p key={index} className="text-sm text-zinc-400">{member.fullname || "Jogador sem nome"} {"("+member.nickname+")"}</p>
                       ))}
                     </div>
                   </div>

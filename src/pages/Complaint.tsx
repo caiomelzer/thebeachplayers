@@ -113,7 +113,7 @@ const Complaint = () => {
 
           <div className="space-y-4 mb-8">
             <h2 className="text-lg font-medium text-left">Integrantes</h2>
-            {team.team_members && team.team_members.map((member, index) => (
+            {team && team.map((member, index) => (
               <div
                 key={index}
                 className="w-full bg-zinc-900 rounded-lg p-4 flex items-center text-left"
@@ -124,7 +124,7 @@ const Complaint = () => {
                   className="w-12 h-12 rounded-full mr-4"
                 />
                 <div className="flex-1">
-                  <h3 className="font-medium">{member.nickname || "Jogador sem nome"}</h3>
+                  <h3 className="font-medium">{member.fullname || "Jogador sem nome"} {"("+member.nickname+")"}</h3>
                 </div>
               </div>
             ))}
