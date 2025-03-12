@@ -69,11 +69,6 @@ const Championship = () => {
       }
     }
   });
-  if(teams) { 
-    teams.map((team) => (
-      console.log('team:',  team)
-    ));
-  }
   
 
   // Check if current user is already registered in this championship
@@ -185,25 +180,31 @@ const Championship = () => {
               teams.map((team) => (
                 <button
                   key={team.id}
-                  onClick={() => navigate('/complaint/')}
+                  onClick={() => navigate('/complaint', { 
+                    state: { 
+                      team, 
+                      championship,
+                      championshipId: id
+                    } 
+                  })}
                   className="w-full bg-zinc-900 rounded-lg p-4 flex items-center justify-between " 
                 >
                   <div className="flex items-center gap-2">
                     <div className="flex -space-x-2">
-                      {team && team.length > 0 && (
-                        team.map((player, index) => (
+                      {team.team_members && team.team_members.length > 0 && (
+                        team.team_members.map((member, index) => (
                           <img
                             key={index}
-                            src={player.avatar_url || "/placeholder.svg"}
-                            alt="Player 1"
+                            src={member.avatar_url || "/placeholder.svg"}
+                            alt={`Player ${index + 1}`}
                             className="w-8 h-8 rounded-full border-2 border-black"
                           />
                         ))
                       )}
                     </div>
                     <div>
-                      {team && team.map((member) => (
-                        <p class="text-sm text-zinc-400">{member.nickname || "Jogador sem nome"} ({member.fullname || "Jogador sem nome"})</p>
+                      {team.team_members && team.team_members.map((member, index) => (
+                        <p key={index} className="text-sm text-zinc-400">{member.nickname || "Jogador sem nome"}</p>
                       ))}
                     </div>
                   </div>
