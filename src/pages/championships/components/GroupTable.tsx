@@ -41,11 +41,11 @@ export const GroupTable = ({ name, teams }: GroupProps) => {
               <div>Sem jogadores</div>
             )}
           </div>
-          <div className="col-span-1 text-center">{team.j}</div>
-          <div className="col-span-1 text-center">{team.p}</div>
-          <div className="col-span-1 text-center">{team.v}</div>
-          <div className="col-span-1 text-center">{team.d}</div>
-          <div className="col-span-1 text-center">{team.s}</div>
+          <div className="col-span-1 text-center">{team.j !== undefined ? team.j : '-'}</div>
+          <div className="col-span-1 text-center">{team.p !== undefined ? String(team.p) : '-'}</div>
+          <div className="col-span-1 text-center">{team.v !== undefined ? team.v : '-'}</div>
+          <div className="col-span-1 text-center">{team.d !== undefined ? team.d : '-'}</div>
+          <div className="col-span-1 text-center">{team.s !== undefined ? team.s : '-'}</div>
         </div>
       ))}
     </div>

@@ -9,7 +9,7 @@ import { ChampionshipDetailTabs } from "./championships/components/ChampionshipD
 import { GroupTable } from "./championships/components/GroupTable";
 import { GamesList } from "./championships/components/GamesList";
 import { ResultsTable } from "./championships/components/ResultsTable";
-import { fetchChampionshipGroups } from "./championships/services/championshipGroupsService";
+import { fetchChampionshipGroups, GroupTeam } from "./championships/services/championshipGroupsService";
 import { fetchChampionshipDetail } from "./championships/services/championshipDetailService";
 import { fetchChampionshipGames } from "./championships/services/championshipGamesService";
 import { fetchChampionshipResults } from "./championships/services/championshipResultsService";
@@ -90,13 +90,13 @@ const ChampionshipDetails = () => {
 
   // Group teams by group label
   const groupedTeams = groups && Array.isArray(groups) 
-    ? groups.reduce((acc, team) => {
+    ? groups.reduce((acc: Record<string, GroupTeam[]>, team: GroupTeam) => {
         if (!acc[team.group_label]) {
           acc[team.group_label] = [];
         }
         acc[team.group_label].push(team);
         return acc;
-      }, {} as Record<string, typeof groups>)
+      }, {} as Record<string, GroupTeam[]>)
     : {};
 
   const renderContent = () => {
@@ -122,7 +122,7 @@ const ChampionshipDetails = () => {
                   teamId: team.team_id,
                   members: team.members,
                   j: team.games,
-                  p: team.wins * 3, // Considerando 3 pontos por vitória
+                  p: typeof team.wins === 'number' ? team.wins * 3 : '-', // Ensure we have a valid value
                   v: team.wins,
                   d: team.defeats,
                   s: team.total
