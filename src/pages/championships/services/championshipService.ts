@@ -18,15 +18,16 @@ export const fetchChampionships = async (modalityId?: string, forceRefresh = fal
   try {
     console.log("Fetching championships from API");
     const response = await apiClient.get("/api/championships/" + modalityId);
-    
+    console.log("Response aaaadata:", response.data);
     if (!response.data) {
       throw new Error("A resposta da API está vazia.");
     }
-
-    championshipsCache = response.data;
+    const agora = new Date();
+    console.log("agora:", agora);
+    championshipsCache = response.data.filter(item => new Date(item.occurs) > new Date());
     lastFetchTime = now;
 
-    return response.data;
+    return response.data.filter(item => new Date(item.occurs) > new Date());
   } catch (error) {
     console.error("Error fetching championships:", error);
     throw error;

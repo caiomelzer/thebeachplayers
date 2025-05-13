@@ -146,12 +146,12 @@ const Home = () => {
           Esta é a sua colocação em um total de {countPlayers} atletas.
         </p>
         <div className="flex justify-center">
-          <button 
+          {/* <button 
             onClick={() => navigate('/profile')}
             className="text-sm text-zinc-400 hover:text-white transition-colors"
           >
             Ver mais detalhes
-          </button>
+          </button>*/}
         </div>
       </div>
 
@@ -162,7 +162,7 @@ const Home = () => {
         <div className="grid grid-cols-2 gap-4">
           {/* First four cards remain the same */}
           <button 
-            onClick={() => navigate('/championships', { state: { initialFilter: 'finished' } })}
+            onClick={() => navigate('/championships', { state: { initialFilter: 'all' } })}
             className="bg-zinc-900 p-4 rounded-xl text-left"
           >
             <div className="bg-blue-900 p-2 rounded-lg w-fit mb-2">
@@ -178,10 +178,10 @@ const Home = () => {
           </button>
 
           
-          {/* Recent Championships Card */}
+          {/* Recent Championships Card
           <button 
             onClick={() => navigate('/championships', { state: { initialFilter: 'soon' } })}
-            className="bg-zinc-900 p-4 rounded-xl text-left"
+            className="bg-zinc-900 p-4 rounded-xl text-left cursor-not-allowed"
           >
             <div className="bg-purple-900 p-2 rounded-lg w-fit mb-2">
               <CheckSquare className="w-5 h-5 text-white" />
@@ -193,7 +193,7 @@ const Home = () => {
               </div>
               <span className="text-purple-500 text-2xl font-bold">{stats.recent_championships}</span>
             </div>
-          </button>
+          </button> */}
 
           {/* Jogadores Card */}
           <button 

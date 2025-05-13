@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/integrations/api/client";
 import { toast } from "sonner";
 import type { UserModality } from "@/types/database";
+import imageCompression from 'browser-image-compression';
 
 type Modality = UserModality['modality'];
 
@@ -14,16 +15,21 @@ const Edit = () => {
   const { user, signOut } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    // Extrai a data em formato ISO e pega só a parte "YYYY-MM-DD"
+    return date.toISOString().split("T")[0];
+  };
   const [formData, setFormData] = useState({
     full_name: user?.full_name || "",
     nickname: user?.nickname || "",
-    born: user?.born || "",
+    born: formatDate(user?.born),
     gender: user?.gender || "",
   });
   const [selectedModalities, setSelectedModalities] = useState<Modality[]>(
     user?.modalities?.map(m => m.modality as Modality) || []
   );
-  console.log(user);
   const handleLogout = async () => {
     try {
       await signOut();
@@ -40,29 +46,38 @@ const Edit = () => {
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
+  
     try {
       setIsLoading(true);
+      toast.success('Foto selecionada com sucesso');
+  
+      const options = {
+        maxSizeMB: 1, // tamanho máximo em MB
+        maxWidthOrHeight: 1024, // limita o tamanho da imagem
+        useWebWorker: true,
+      };
+  
+      const compressedFile = await imageCompression(file, options);
+      
       const formData = new FormData();
-      formData.append('avatar', file);
-
+      formData.append('avatar', compressedFile);
+  
       const response = await apiClient.put('/api/user/avatar', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+  
       if (response.status === 200) {
         toast.success('Foto atualizada com sucesso!');
       } else {
-        throw new Error('Upload failed');
+        throw new Error('Upload falhou');
       }
     } catch (error) {
-      console.error('Error uploading avatar:', error);
-      toast.error('Erro ao atualizar a foto');
+      console.error('Erro ao fazer upload:', error);
+      toast.error('Erro ao atualizar a foto: ' + error);
     } finally {
       setIsLoading(false);
-      window.location.reload();
     }
   };
 

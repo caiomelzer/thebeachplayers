@@ -25,8 +25,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!token) return null;
 
       // Usar o endpoint /api/user/me para buscar os dados do usuário
+      //const data = JSON.parse(localStorage.getItem('userData'));
       const { data } = await apiClient.get('/api/user/me');
-      
+      console.log('User data:', data);
+
       if (!data) return null;
       
       // Transform API response to match our User type
@@ -54,7 +56,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           updated_at: new Date().toISOString()
         }
       };
-
+      if (userData && !localStorage.getItem("userData")) {
+        localStorage.setItem("userData", JSON.stringify(userData));
+      }
       return userData;
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -70,7 +74,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (token) {
           // Verify the token and get user data
-          const userData = await fetchUserData();
+          console.log('Token found, fetching user data...');
+          const userData = await fetchUserData(); 
           setUser(userData);
         }
       } catch (error) {
@@ -130,6 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         rating: userData.rating,
         modalities: userData.modalities || []
       });
+      localStorage.setItem('userData', JSON.stringify(userData));
 
       return { data: userData, error: null };
     } catch (error: any) {
@@ -144,6 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Remove the token from local storage
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('userData');
       // Clear the user state
       setUser(null);
       // Redirect to login page
