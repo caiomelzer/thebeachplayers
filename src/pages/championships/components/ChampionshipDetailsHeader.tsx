@@ -1,19 +1,17 @@
 
 import { ChevronLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 interface ChampionshipDetailsHeaderProps {
   title: string;
   logoUrl?: string;
+  onBackClick: () => void;
 }
 
-export const ChampionshipDetailsHeader = ({ title, logoUrl }: ChampionshipDetailsHeaderProps) => {
-  const navigate = useNavigate();
-
+export const ChampionshipDetailsHeader = ({ title, logoUrl, onBackClick }: ChampionshipDetailsHeaderProps) => {
   return (
     <div className="relative py-4">
       <button 
-        onClick={() => navigate(-1)} 
+        onClick={onBackClick} 
         className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-[#0EA5E9] rounded-full p-1.5"
       >
         <ChevronLeft className="h-5 w-5 text-white" />

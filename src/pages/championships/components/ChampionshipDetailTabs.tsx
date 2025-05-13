@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 interface ChampionshipDetailTabsProps {
@@ -9,34 +9,42 @@ interface ChampionshipDetailTabsProps {
 
 export const ChampionshipDetailTabs = ({ activeTab, onChange }: ChampionshipDetailTabsProps) => {
   return (
-    <div className="flex justify-center space-x-2 mt-4 mb-6">
-      <button
-        onClick={() => onChange("groups")}
-        className={cn(
-          "px-6 py-2 rounded-full text-white",
-          activeTab === "groups" ? "bg-[#0EA5E9]" : "bg-zinc-800"
-        )}
+    <div className="flex justify-center mt-4 mb-6">
+      <Tabs 
+        value={activeTab}
+        onValueChange={(value) => onChange(value as "groups" | "matches" | "general")}
+        className="w-full max-w-md"
       >
-        Grupos
-      </button>
-      <button
-        onClick={() => onChange("matches")}
-        className={cn(
-          "px-6 py-2 rounded-full text-white",
-          activeTab === "matches" ? "bg-[#0EA5E9]" : "bg-zinc-800"
-        )}
-      >
-        Jogos
-      </button>
-      <button
-        onClick={() => onChange("general")}
-        className={cn(
-          "px-6 py-2 rounded-full text-white",
-          activeTab === "general" ? "bg-[#0EA5E9]" : "bg-zinc-800"
-        )}
-      >
-        Geral
-      </button>
+        <TabsList className="grid grid-cols-3 w-full bg-black">
+          <TabsTrigger 
+            value="groups"
+            className={cn(
+              "px-6 py-2 rounded-full text-white",
+              activeTab === "groups" ? "bg-[#0EA5E9]" : "bg-zinc-800"
+            )}
+          >
+            Grupos
+          </TabsTrigger>
+          <TabsTrigger 
+            value="matches"
+            className={cn(
+              "px-6 py-2 rounded-full text-white",
+              activeTab === "matches" ? "bg-[#0EA5E9]" : "bg-zinc-800"
+            )}
+          >
+            Jogos
+          </TabsTrigger>
+          <TabsTrigger 
+            value="general"
+            className={cn(
+              "px-6 py-2 rounded-full text-white",
+              activeTab === "general" ? "bg-[#0EA5E9]" : "bg-zinc-800"
+            )}
+          >
+            Geral
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
     </div>
   );
 };

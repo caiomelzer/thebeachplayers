@@ -1,19 +1,24 @@
 
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { ChampionshipDetailsHeader } from "./championships/components/ChampionshipDetailsHeader";
 import { ChampionshipDetailTabs } from "./championships/components/ChampionshipDetailTabs";
 import { GroupTable } from "./championships/components/GroupTable";
+import { GamesList } from "./championships/components/GamesList";
+import { ResultsTable } from "./championships/components/ResultsTable";
 import { fetchChampionshipGroups } from "./championships/services/championshipGroupsService";
 import { fetchChampionshipDetail } from "./championships/services/championshipDetailService";
+import { fetchChampionshipGames } from "./championships/services/championshipGamesService";
+import { fetchChampionshipResults } from "./championships/services/championshipResultsService";
 
 const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e"; // Hardcoded modality ID
 
 const ChampionshipDetails = () => {
   const { id: championshipId } = useParams();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"groups" | "matches" | "general">("groups");
 
   const { 
@@ -40,7 +45,7 @@ const ChampionshipDetails = () => {
     queryFn: () => championshipId ? fetchChampionshipGroups(modalityId, championshipId) : Promise.reject(new Error("ID não fornecido")),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
-    enabled: !!championshipId,
+    enabled: !!championshipId && activeTab === "groups",
     meta: {
       onError: (error: Error) => {
         console.error("Error fetching championship groups:", error);
@@ -49,8 +54,56 @@ const ChampionshipDetails = () => {
     }
   });
 
+  const {
+    data: games,
+    isLoading: isLoadingGames
+  } = useQuery({
+    queryKey: ['championship-games', championshipId],
+    queryFn: () => championshipId ? fetchChampionshipGames(championshipId) : Promise.reject(new Error("ID não fornecido")),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: !!championshipId && activeTab === "matches",
+    meta: {
+      onError: (error: Error) => {
+        console.error("Error fetching championship games:", error);
+        toast.error("Erro ao buscar jogos do campeonato");
+      }
+    }
+  });
+
+  const {
+    data: results,
+    isLoading: isLoadingResults
+  } = useQuery({
+    queryKey: ['championship-results', championshipId],
+    queryFn: () => championshipId ? fetchChampionshipResults(championshipId) : Promise.reject(new Error("ID não fornecido")),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: !!championshipId && activeTab === "general",
+    meta: {
+      onError: (error: Error) => {
+        console.error("Error fetching championship results:", error);
+        toast.error("Erro ao buscar resultados do campeonato");
+      }
+    }
+  });
+
+  // Group teams by group label
+  const groupedTeams = groups && Array.isArray(groups) 
+    ? groups.reduce((acc, team) => {
+        if (!acc[team.group_label]) {
+          acc[team.group_label] = [];
+        }
+        acc[team.group_label].push(team);
+        return acc;
+      }, {} as Record<string, typeof groups>)
+    : {};
+
   const renderContent = () => {
-    if (isLoadingChampionship || isLoadingGroups) {
+    if ((isLoadingChampionship && activeTab === "groups") || 
+        (isLoadingGroups && activeTab === "groups") || 
+        (isLoadingGames && activeTab === "matches") || 
+        (isLoadingResults && activeTab === "general")) {
       return <p className="text-center text-white py-6">Carregando...</p>;
     }
 
@@ -61,11 +114,11 @@ const ChampionshipDetails = () => {
         }
         return (
           <div className="px-4">
-            {Array.isArray(groups) && groups.map((group, index) => (
+            {Object.entries(groupedTeams).map(([groupLabel, groupTeams]) => (
               <GroupTable 
-                key={group.label} 
-                name={`Grupo ${group.label}`}
-                teams={group.teams.map(team => ({
+                key={groupLabel} 
+                name={`Grupo ${groupLabel}`}
+                teams={groupTeams.map(team => ({
                   teamId: team.team_id,
                   members: team.members,
                   j: team.games,
@@ -79,12 +132,22 @@ const ChampionshipDetails = () => {
           </div>
         );
       case "matches":
-        return <p className="text-center text-white py-6">Informações sobre jogos em breve.</p>;
+        if (!games || games.length === 0) {
+          return <p className="text-center text-white py-6">Nenhum jogo disponível.</p>;
+        }
+        return <GamesList games={games} />;
       case "general":
-        return <p className="text-center text-white py-6">Informações gerais em breve.</p>;
+        if (!results || results.length === 0) {
+          return <p className="text-center text-white py-6">Nenhum resultado disponível.</p>;
+        }
+        return <ResultsTable results={results} />;
       default:
         return null;
     }
+  };
+
+  const handleBackClick = () => {
+    navigate(`/championship/${championshipId}`);
   };
 
   return (
@@ -93,6 +156,7 @@ const ChampionshipDetails = () => {
         <ChampionshipDetailsHeader 
           title={championship?.title || "Campeonato"} 
           logoUrl={championship?.banner_url}
+          onBackClick={handleBackClick}
         />
 
         <ChampionshipDetailTabs activeTab={activeTab} onChange={setActiveTab} />
