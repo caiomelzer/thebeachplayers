@@ -5,7 +5,7 @@ interface Player {
 
 interface TeamRecord {
   teamId: string;
-  members: string;
+  members: string | undefined;
   j: number; // Jogos
   p: number | string; // Pontos
   v: number; // Vitórias
@@ -33,9 +33,13 @@ export const GroupTable = ({ name, teams }: GroupProps) => {
       {teams.map((team, index) => (
         <div key={team.teamId || index} className="grid grid-cols-12 text-sm text-white py-1">
           <div className="col-span-7">
-            {team.members.split(',').map((member, idx) => (
-              <div key={idx}>{member.trim()}</div>
-            ))}
+            {team.members ? (
+              team.members.split(',').map((member, idx) => (
+                <div key={idx}>{member.trim()}</div>
+              ))
+            ) : (
+              <div>Sem jogadores</div>
+            )}
           </div>
           <div className="col-span-1 text-center">{team.j}</div>
           <div className="col-span-1 text-center">{team.p}</div>
