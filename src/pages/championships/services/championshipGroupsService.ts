@@ -6,6 +6,18 @@ let groupsCache: Record<string, any> = {};
 let lastFetchTimes: Record<string, number> = {};
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
 
+export interface GroupTeam {
+  team_id: string;
+  members: string;
+  wins: number;
+  defeats: number;
+  games: number;
+  pros: string;
+  cons: string;
+  group_label: string;
+  total: string;
+}
+
 export const fetchChampionshipGroups = async (modalityId: string, championshipId: string, forceRefresh = false) => {
   const cacheKey = `${modalityId}-${championshipId}`;
   const now = Date.now();
@@ -25,11 +37,28 @@ export const fetchChampionshipGroups = async (modalityId: string, championshipId
       throw new Error("A resposta da API de grupos está vazia.");
     }
     
-    // Cache the response
-    groupsCache[cacheKey] = response.data;
+    // Agrupar times por group_label
+    const groupedTeams: Record<string, GroupTeam[]> = {};
+    response.data.forEach((team: GroupTeam) => {
+      if (!groupedTeams[team.group_label]) {
+        groupedTeams[team.group_label] = [];
+      }
+      groupedTeams[team.group_label].push(team);
+    });
+    
+    // Converter o objeto agrupado em um array de grupos
+    const groupsArray = Object.keys(groupedTeams).map(label => {
+      return {
+        label,
+        teams: groupedTeams[label]
+      };
+    });
+    
+    // Cache the processed response
+    groupsCache[cacheKey] = groupsArray;
     lastFetchTimes[cacheKey] = now;
     
-    return response.data;
+    return groupsArray;
   } catch (error) {
     console.error("Error fetching championship groups:", error);
     throw error;

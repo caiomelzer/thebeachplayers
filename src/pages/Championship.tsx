@@ -9,6 +9,7 @@ import { ChampionshipDetailHeader } from "./championships/components/Championshi
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { fetchChampionshipTeams } from "./championships/services/championshipDetailService";
+import { Team } from "@/types/database";
 
 const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e"; // Hardcoded modality ID
 
@@ -69,7 +70,6 @@ const Championship = () => {
     }
   });
   
-
   // Check if current user is already registered in this championship
   const isUserRegistered = (): boolean => {
     if (!user || !teams) return false;
@@ -179,11 +179,11 @@ const Championship = () => {
           
           {/* Participants List */}
           <div className="space-y-3 pb-6">
-            <h3 className="text-zinc-400">Participantes ({teams?.length || 0} inscritos)</h3>
+            <h3 className="text-zinc-400">Participantes ({teams && Array.isArray(teams) ? teams.length : 0} inscritos)</h3>
             
             {isLoadingTeams ? (
               <p className="text-center text-zinc-400 py-4">Carregando times...</p>
-            ) : teams && teams.length > 0 ? (
+            ) : teams && Array.isArray(teams) && teams.length > 0 ? (
               teams.map((team) => (
                 <button
                   key={team.id}
@@ -198,7 +198,7 @@ const Championship = () => {
                 >
                   <div className="flex items-center gap-2">
                     <div className="flex -space-x-2">
-                      {team && team.length > 0 && (
+                      {team && Array.isArray(team) && team.length > 0 && (
                         team.map((member, index) => (
                           <img
                             key={index}
@@ -210,7 +210,7 @@ const Championship = () => {
                       )}
                     </div>
                     <div>
-                      {team && team.map((member, index) => (
+                      {team && Array.isArray(team) && team.map((member, index) => (
                         <p key={index} className="text-sm text-zinc-400">{member.fullname || "Jogador sem nome"} {"("+member.nickname+")"}</p>
                       ))}
                     </div>

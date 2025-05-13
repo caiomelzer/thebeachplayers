@@ -63,15 +63,16 @@ const ChampionshipDetails = () => {
           <div className="px-4">
             {Array.isArray(groups) && groups.map((group, index) => (
               <GroupTable 
-                key={index} 
-                name={`Grupo ${String.fromCharCode(65 + index)}`} // A, B, C, etc.
-                teams={(group?.teams || []).map(team => ({
-                  players: team.players.map(player => ({ name: player.name || player.nickname })),
-                  j: team.matches || 0,
-                  p: team.points || 0,
-                  v: team.victories || 0,
-                  d: team.defeats || 0,
-                  s: team.balance || 0
+                key={group.label} 
+                name={`Grupo ${group.label}`}
+                teams={group.teams.map(team => ({
+                  teamId: team.team_id,
+                  members: team.members,
+                  j: team.games,
+                  p: team.wins * 3, // Considerando 3 pontos por vitória
+                  v: team.wins,
+                  d: team.defeats,
+                  s: team.total
                 }))}
               />
             ))}

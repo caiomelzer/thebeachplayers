@@ -1,16 +1,16 @@
 
 interface Player {
   name: string;
-  partner?: string;
 }
 
 interface TeamRecord {
-  players: Player[];
+  teamId: string;
+  members: string;
   j: number; // Jogos
-  p: number; // Pontos
+  p: number | string; // Pontos
   v: number; // Vitórias
   d: number; // Derrotas
-  s: number; // Saldo
+  s: string; // Saldo
 }
 
 interface GroupProps {
@@ -31,10 +31,10 @@ export const GroupTable = ({ name, teams }: GroupProps) => {
         <div className="col-span-1 text-center">S</div>
       </div>
       {teams.map((team, index) => (
-        <div key={index} className="grid grid-cols-12 text-sm text-white py-1">
+        <div key={team.teamId || index} className="grid grid-cols-12 text-sm text-white py-1">
           <div className="col-span-7">
-            {team.players.map((player, idx) => (
-              <div key={idx}>{player.name}</div>
+            {team.members.split(',').map((member, idx) => (
+              <div key={idx}>{member.trim()}</div>
             ))}
           </div>
           <div className="col-span-1 text-center">{team.j}</div>
