@@ -109,7 +109,7 @@ const ChampionshipDetails = () => {
 
     switch (activeTab) {
       case "groups":
-        if (!groups || groups.length === 0) {
+        if (!groups || !Array.isArray(groups) || groups.length === 0) {
           return <p className="text-center text-white py-6">Nenhum grupo disponível.</p>;
         }
         return (
@@ -132,12 +132,12 @@ const ChampionshipDetails = () => {
           </div>
         );
       case "matches":
-        if (!games || games.length === 0) {
+        if (!games || !Array.isArray(games) || games.length === 0) {
           return <p className="text-center text-white py-6">Nenhum jogo disponível.</p>;
         }
         return <GamesList games={games} />;
       case "general":
-        if (!results || results.length === 0) {
+        if (!results || !Array.isArray(results) || results.length === 0) {
           return <p className="text-center text-white py-6">Nenhum resultado disponível.</p>;
         }
         return <ResultsTable results={results} />;
