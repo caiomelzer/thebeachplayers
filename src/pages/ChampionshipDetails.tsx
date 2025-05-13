@@ -59,7 +59,7 @@ const ChampionshipDetails = () => {
     isLoading: isLoadingGames
   } = useQuery({
     queryKey: ['championship-games', championshipId],
-    queryFn: () => championshipId ? fetchChampionshipGames(championshipId) : Promise.reject(new Error("ID não fornecido")),
+    queryFn: () => championshipId ? fetchChampionshipGames(modalityId, championshipId) : Promise.reject(new Error("ID não fornecido")),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     enabled: !!championshipId && activeTab === "matches",
@@ -76,7 +76,7 @@ const ChampionshipDetails = () => {
     isLoading: isLoadingResults
   } = useQuery({
     queryKey: ['championship-results', championshipId],
-    queryFn: () => championshipId ? fetchChampionshipResults(championshipId) : Promise.reject(new Error("ID não fornecido")),
+    queryFn: () => championshipId ? fetchChampionshipResults(modalityId, championshipId) : Promise.reject(new Error("ID não fornecido")),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     enabled: !!championshipId && activeTab === "general",

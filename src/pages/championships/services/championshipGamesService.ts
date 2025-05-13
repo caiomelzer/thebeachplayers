@@ -6,7 +6,7 @@ let championshipGamesCache: Record<string, any> = {};
 let lastFetchTimes: Record<string, number> = {};
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
 
-export const fetchChampionshipGames = async (championshipId: string, forceRefresh = false) => {
+export const fetchChampionshipGames = async (modalityId:string, championshipId: string, forceRefresh = false) => {
   const cacheKey = `games-${championshipId}`;
   const now = Date.now();
   
@@ -18,7 +18,7 @@ export const fetchChampionshipGames = async (championshipId: string, forceRefres
   
   try {
     console.log(`Fetching games for championship ID: ${championshipId}`);
-    const response = await apiClient.get(`/api/championship/${championshipId}/games`);
+    const response = await apiClient.get(`/api/championships/${modalityId}/${championshipId}/games`);
     console.log("Games API response:", response);
     
     if (!response.data) {
