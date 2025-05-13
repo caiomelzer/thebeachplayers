@@ -14,6 +14,7 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Championships from "./pages/Championships";
 import Championship from "./pages/Championship";
+import ChampionshipDetails from "./pages/ChampionshipDetails";
 import ChampionshipRules from "./pages/ChampionshipRules";
 import Terms from "./pages/Terms";
 import Complaint from "./pages/Complaint";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/championships" element={<ProtectedRoute><Championships /></ProtectedRoute>} />
             <Route path="/championship/:id" element={<ProtectedRoute><Championship /></ProtectedRoute>} />
+            <Route path="/championship/:id/details" element={<ProtectedRoute><ChampionshipDetails /></ProtectedRoute>} />
             <Route path="/championship/:id/rules" element={<ProtectedRoute><ChampionshipRules /></ProtectedRoute>} />
             <Route path="/create-team/:id" element={<ProtectedRoute><CreateTeam /></ProtectedRoute>} />
             <Route path="/select-player" element={<ProtectedRoute><SelectPlayer /></ProtectedRoute>} />

@@ -45,7 +45,7 @@ export const ChampionshipCard = ({ championship, onClick }: ChampionshipCardProp
       <div className="flex-1">
         <h3 className="font-medium">{championship.title}</h3>
         <p className="text-sm text-zinc-400">
-          {championship.gender} - {championship.category}
+          {championship.category}
         </p>
         <p className={`text-sm ${championship.isDisabled ? 'text-red-500' : 'text-zinc-400'}`}>
         {formatDisplayDate(championship.occurs)} - {championship.status || championship.price}

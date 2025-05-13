@@ -9,7 +9,6 @@ import { ChampionshipDetailHeader } from "./championships/components/Championshi
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { fetchChampionshipTeams } from "./championships/services/championshipDetailService";
-import { Team } from "@/types/database";
 
 const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e"; // Hardcoded modality ID
 
@@ -100,8 +99,16 @@ const Championship = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="relative">
-        {/* Header */}
-        <ChampionshipDetailHeader onBackClick={() => navigate('/championships')} />
+        {/* Header with Follow Button */}
+        <div className="relative">
+          <ChampionshipDetailHeader onBackClick={() => navigate('/championships')} />
+          <Button
+            onClick={() => navigate(`/championship/${id}/details`)}
+            className="absolute right-4 top-4 bg-[#0EA5E9] hover:bg-[#0b8ec8] text-white"
+          >
+            Acompanhar
+          </Button>
+        </div>
 
         {/* Championship Logo and Title */}
         <div className="text-center pt-16 pb-8 px-6">

@@ -2,7 +2,7 @@
 export type UserModality = {
   id: string;
   user_id: string;
-  modality: 'Vôlei' | 'Beach Tennis' | 'Futvôlei';
+  modality: 'Vôlei' | 'Beach Tennis' | 'Futvôlei' | 'volei' | 'beach_tennis' | 'futvolei';
   status: 'active' | 'inactive';
   created_at: string;
   updated_at: string;
