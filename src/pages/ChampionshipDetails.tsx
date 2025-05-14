@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -70,6 +69,7 @@ const ChampionshipDetails = () => {
       }
     }
   });
+  console.log("Games:", games);
 
   const {
     data: results,
@@ -99,6 +99,8 @@ const ChampionshipDetails = () => {
       }, {} as Record<string, GroupTeam[]>)
     : {};
 
+  console.log("Grouped Teams:", groups);
+
   const renderContent = () => {
     if ((isLoadingChampionship && activeTab === "groups") || 
         (isLoadingGroups && activeTab === "groups") || 
@@ -114,18 +116,18 @@ const ChampionshipDetails = () => {
         }
         return (
           <div className="px-4">
-            {Object.entries(groupedTeams).map(([groupLabel, groupTeams]) => (
+            {groups.map(group => (
               <GroupTable 
-                key={groupLabel} 
-                name={`Grupo ${groupLabel}`}
-                teams={groupTeams.map(team => ({
-                  teamId: team.team_id,
-                  members: team.members,
-                  j: team.games,
-                  p: typeof team.wins === 'number' ? team.wins * 3 : '-', // Ensure we have a valid value
-                  v: team.wins,
-                  d: team.defeats,
-                  s: team.total
+                key={group.label} 
+                name={`Grupo ${group.label}`}
+                teams={group.teams.map(team => ({
+                  teamId: team.team_id || 0,
+                  members: team.members || 0,
+                  j: team.games || 0, 
+                  p: team.wins || 0, 
+                  v: team.wins || 0,
+                  d: team.defeats || 0,
+                  s: team.total || 0
                 }))}
               />
             ))}

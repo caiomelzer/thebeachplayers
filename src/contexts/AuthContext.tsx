@@ -1,190 +1,178 @@
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { apiClient } from "@/integrations/api/client";
-
-// Define user type based on your database schema
-type User = {
-  id: string;
-  email?: string;
-  full_name?: string;
-  nickname?: string;
-  born?: string;
-  gender?: string;
-  cpf?: string;
-  avatar_url?: string;
-  rating?: number;
-  modalities?: Array<{
-    modality: string;
-    status: string;
-  }>;
-};
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { apiClient } from '@/integrations/api/client';
+import type { User, PlayerStatistics, UserModality } from '@/types/database';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  error: Error | null;
-  signIn: (email: string, password: string) => Promise<{ data?: User; error?: Error }>;
-  signUp: (email: string, password: string, cpf: string, nickname: string) => Promise<{ data?: any; error?: Error }>;
+  signUp: (email: string, password: string, document: string, nickname: string) => Promise<any>;
+  signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const navigate = useNavigate();
+
+  const fetchUserData = async (): Promise<User | null> => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) return null;
+
+      // Usar o endpoint /api/user/me para buscar os dados do usuário
+      //const data = JSON.parse(localStorage.getItem('userData'));
+      const { data } = await apiClient.get('/api/user/me');
+      console.log('User data:', data);
+
+      if (!data) return null;
+      
+      // Transform API response to match our User type
+      const userData: User = {
+        id: data.id,
+        full_name: data.full_name,
+        nickname: data.nickname,
+        avatar_url: data.avatar_url,
+        born: data.born,
+        gender: data.gender,
+        cpf: data.cpf,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        ranking: data.ranking,
+        rating: data.rating,
+        modalities: data.modalities || [],
+        statistics: data.statistics || {
+          user_id: data.id,
+          ranking: 0,
+          victories: 0,
+          defeats: 0,
+          total_championships: 0,
+          recent_championships: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      };
+      if (userData && !localStorage.getItem("userData")) {
+        localStorage.setItem("userData", JSON.stringify(userData));
+      }
+      return userData;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      return null;
+    }
+  };
 
   useEffect(() => {
-    // Check for existing session on component mount
-    const checkSession = async () => {
+    const checkAuth = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession();
+        setLoading(true);
+        const token = localStorage.getItem('auth_token');
         
-        if (error) {
-          throw error;
-        }
-        
-        if (data.session) {
-          // If session exists, get user data from your API
-          const userResponse = await apiClient.get('/api/user/me');
-          setUser(userResponse.data);
+        if (token) {
+          // Verify the token and get user data
+          console.log('Token found, fetching user data...');
+          const userData = await fetchUserData(); 
+          setUser(userData);
         }
       } catch (error) {
-        console.error("Error checking auth session:", error);
-        setError(error as Error);
+        console.error('Auth check error:', error);
+        localStorage.removeItem('auth_token');
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
-    checkSession();
-
-    // Subscribe to auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session) {
-          // Get user data from your API
-          try {
-            const userResponse = await apiClient.get('/api/user/me');
-            setUser(userResponse.data);
-          } catch (error) {
-            console.error("Error fetching user data:", error);
-          }
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-        }
-      }
-    );
-
-    return () => {
-      if (authListener.subscription) {
-        authListener.subscription.unsubscribe();
-      }
-    };
+    checkAuth();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, document: string, nickname: string) => {
     try {
-      setLoading(true);
-      
-      // Sign in with Supabase auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      const response = await apiClient.post('/api/auth/register', {
         email,
         password,
+        cpf: document,
+        nickname
       });
-
-      if (authError) {
-        throw authError;
-      }
-
-      // Get user data from your API
-      const userResponse = await apiClient.get('/api/user/me');
-      const userData = userResponse.data;
-      
-      setUser(userData);
-      return { data: userData };
+      return response;
     } catch (error: any) {
-      console.error("Error signing in:", error);
-      setError(error);
-      return { error: error as Error };
-    } finally {
-      setLoading(false);
+      console.error('Signup error:', error);
+      
+      const errorMessage = error.response?.data?.message || 'Erro ao cadastrar';
+      return { data: null, error: { message: errorMessage } };
     }
   };
 
-  const signUp = async (email: string, password: string, cpf: string, nickname: string) => {
+  const signIn = async (email: string, password: string) => {
     try {
-      setLoading(true);
-      
-      // Register with Supabase auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const response = await apiClient.post('/api/auth/login', {
         email,
-        password,
+        password
       });
 
-      if (authError) {
-        throw authError;
-      }
+      const { token, user: userData } = response.data;
 
-      // Additional user data registration through API
-      const userData = {
-        email,
-        cpf,
-        nickname
-      };
-      
-      const userResponse = await apiClient.post('/api/user/register', userData);
-      
-      return { data: userResponse.data };
+      // Store auth token
+      localStorage.setItem('auth_token', token);
+
+      // Update user state with all the properties
+      setUser({
+        id: userData.id,
+        full_name: userData.full_name,
+        nickname: userData.nickname,
+        avatar_url: userData.avatar_url,
+        born: userData.born,
+        gender: userData.gender,
+        cpf: userData.cpf,
+        created_at: userData.created_at,
+        updated_at: userData.updated_at,
+        statistics: userData.statistics,
+        ranking: userData.ranking,
+        rating: userData.rating,
+        modalities: userData.modalities || []
+      });
+      localStorage.setItem('userData', JSON.stringify(userData));
+
+      return { data: userData, error: null };
     } catch (error: any) {
-      console.error("Error signing up:", error);
-      setError(error);
-      return { error: error as Error };
-    } finally {
-      setLoading(false);
+      console.error('Login error:', error);
+      
+      const errorMessage = error.response?.data?.message || 'Credenciais inválidas';
+      return { data: null, error: { message: errorMessage } };
     }
   };
 
   const signOut = async () => {
     try {
-      setLoading(true);
-      await supabase.auth.signOut();
+      // Remove the token from local storage
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('userData');
+      // Clear the user state
       setUser(null);
-      
-      // Optionally notify the user
-      toast.success("Logout realizado com sucesso");
-    } catch (error: any) {
-      console.error("Error signing out:", error);
-      setError(error);
-      toast.error("Erro ao realizar logout");
-    } finally {
-      setLoading(false);
+      // Redirect to login page
+      navigate('/login');
+      return Promise.resolve();
+    } catch (error) {
+      console.error('Signout error:', error);
+      return Promise.reject(error);
     }
   };
 
-  const value = {
-    user,
-    loading,
-    error,
-    signIn,
-    signUp,
-    signOut
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

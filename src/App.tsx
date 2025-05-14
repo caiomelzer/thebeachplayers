@@ -1,80 +1,69 @@
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// Context Providers
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-
-// Pages
-import Index from "@/pages/Index";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import Home from "@/pages/Home";
-import NotFound from "@/pages/NotFound";
-import ForgotPassword from "@/pages/ForgotPassword";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import Championships from "@/pages/Championships";
-import Championship from "@/pages/Championship";
-import ChampionshipDetails from "@/pages/ChampionshipDetails";
-import ChampionshipRules from "@/pages/ChampionshipRules";
-import Arenas from "@/pages/Arenas";
-import ArenaDetails from "@/pages/ArenaDetails";
-import Players from "@/pages/Players";
-import PlayerProfile from "@/pages/PlayerProfile";
-import Profile from "@/pages/Profile";
-import Edit from "@/pages/Edit";
-import CreateTeam from "@/pages/CreateTeam";
-import SelectPlayer from "@/pages/SelectPlayer";
-import Terms from "@/pages/Terms";
-import Complaint from "@/pages/Complaint";
+import Index from "./pages/Index";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import Home from "./pages/Home";
+import Profile from "./pages/Profile";
+import Championships from "./pages/Championships";
+import Championship from "./pages/Championship";
+import ChampionshipRules from "./pages/ChampionshipRules";
+import Terms from "./pages/Terms";
+import Complaint from "./pages/Complaint";
+import Edit from "./pages/Edit";
+import NotFound from "./pages/NotFound";
+import Players from "./pages/Players";
+import PlayerProfile from "./pages/PlayerProfile";
+import Arenas from "./pages/Arenas";
+import ArenaDetails from "./pages/ArenaDetails";
+import CreateTeam from "./pages/CreateTeam";
+import SelectPlayer from "./pages/SelectPlayer";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
       <AuthProvider>
-        <Router>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
           <Routes>
-            {/* Public Routes */}
+            {/* Public routes */}
             <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/terms" element={<Terms />} />
             
-            {/* Protected Routes */}
+            {/* Protected routes */}
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/championships" element={<ProtectedRoute><Championships /></ProtectedRoute>} />
             <Route path="/championship/:id" element={<ProtectedRoute><Championship /></ProtectedRoute>} />
-            <Route path="/championship/:id/details" element={<ProtectedRoute><ChampionshipDetails /></ProtectedRoute>} />
+            <Route path="/championship/:id/details" element={<ProtectedRoute><Championship /></ProtectedRoute>} />
             <Route path="/championship/:id/rules" element={<ProtectedRoute><ChampionshipRules /></ProtectedRoute>} />
             <Route path="/create-team/:id" element={<ProtectedRoute><CreateTeam /></ProtectedRoute>} />
             <Route path="/select-player" element={<ProtectedRoute><SelectPlayer /></ProtectedRoute>} />
-            <Route path="/arenas" element={<ProtectedRoute><Arenas /></ProtectedRoute>} />
-            <Route path="/arena/:id" element={<ProtectedRoute><ArenaDetails /></ProtectedRoute>} />
             <Route path="/players" element={<ProtectedRoute><Players /></ProtectedRoute>} />
             <Route path="/player/:id" element={<ProtectedRoute><PlayerProfile /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/edit" element={<ProtectedRoute><Edit /></ProtectedRoute>} />
             <Route path="/complaint" element={<ProtectedRoute><Complaint /></ProtectedRoute>} />
-            
-            {/* 404 Route */}
+            <Route path="/edit" element={<ProtectedRoute><Edit /></ProtectedRoute>} />
+            <Route path="/arenas" element={<ProtectedRoute><Arenas /></ProtectedRoute>} />
+            <Route path="/arena/:id" element={<ProtectedRoute><ArenaDetails /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </Router>
-        <Toaster position="top-center" />
+        </TooltipProvider>
       </AuthProvider>
-    </QueryClientProvider>
-  );
-}
+    </BrowserRouter>
+  </QueryClientProvider>
+);
 
 export default App;
