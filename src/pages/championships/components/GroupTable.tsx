@@ -19,6 +19,7 @@ interface GroupProps {
 }
 
 export const GroupTable = ({ name, teams }: GroupProps) => {
+  console.log("GroupTable teams:", teams);
   return (
     <div className="mb-6 bg-zinc-900 rounded-lg p-4">
       <h3 className="text-white font-bold mb-2">{name}</h3>

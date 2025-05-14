@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +8,7 @@ import { ChampionshipDetailTabs } from "./championships/components/ChampionshipD
 import { GroupTable } from "./championships/components/GroupTable";
 import { GamesList } from "./championships/components/GamesList";
 import { ResultsTable } from "./championships/components/ResultsTable";
-import { fetchChampionshipGroups } from "./championships/services/championshipGroupsService";
+import { fetchChampionshipGroups, GroupTeam } from "./championships/services/championshipGroupsService";
 import { fetchChampionshipDetail } from "./championships/services/championshipDetailService";
 import { fetchChampionshipGames } from "./championships/services/championshipGamesService";
 import { fetchChampionshipResults } from "./championships/services/championshipResultsService";
@@ -70,6 +69,7 @@ const ChampionshipDetails = () => {
       }
     }
   });
+  console.log("Games:", games);
 
   const {
     data: results,
@@ -90,14 +90,16 @@ const ChampionshipDetails = () => {
 
   // Group teams by group label
   const groupedTeams = groups && Array.isArray(groups) 
-    ? groups.reduce((acc, team) => {
+    ? groups.reduce((acc: Record<string, GroupTeam[]>, team: GroupTeam) => {
         if (!acc[team.group_label]) {
           acc[team.group_label] = [];
         }
         acc[team.group_label].push(team);
         return acc;
-      }, {} as Record<string, typeof groups>)
+      }, {} as Record<string, GroupTeam[]>)
     : {};
+
+  console.log("Grouped Teams:", groups);
 
   const renderContent = () => {
     if ((isLoadingChampionship && activeTab === "groups") || 
@@ -109,35 +111,35 @@ const ChampionshipDetails = () => {
 
     switch (activeTab) {
       case "groups":
-        if (!groups || groups.length === 0) {
+        if (!groups || !Array.isArray(groups) || groups.length === 0) {
           return <p className="text-center text-white py-6">Nenhum grupo disponível.</p>;
         }
         return (
           <div className="px-4">
-            {Object.entries(groupedTeams).map(([groupLabel, groupTeams]) => (
+            {groups.map(group => (
               <GroupTable 
-                key={groupLabel} 
-                name={`Grupo ${groupLabel}`}
-                teams={groupTeams.map(team => ({
-                  teamId: team.team_id,
-                  members: team.members,
-                  j: team.games,
-                  p: team.wins * 3, // Considerando 3 pontos por vitória
-                  v: team.wins,
-                  d: team.defeats,
-                  s: team.total
+                key={group.label} 
+                name={`Grupo ${group.label}`}
+                teams={group.teams.map(team => ({
+                  teamId: team.team_id || 0,
+                  members: team.members || 0,
+                  j: team.games || 0, 
+                  p: team.wins || 0, 
+                  v: team.wins || 0,
+                  d: team.defeats || 0,
+                  s: team.total || 0
                 }))}
               />
             ))}
           </div>
         );
       case "matches":
-        if (!games || games.length === 0) {
+        if (!games || !Array.isArray(games) || games.length === 0) {
           return <p className="text-center text-white py-6">Nenhum jogo disponível.</p>;
         }
         return <GamesList games={games} />;
       case "general":
-        if (!results || results.length === 0) {
+        if (!results || !Array.isArray(results) || results.length === 0) {
           return <p className="text-center text-white py-6">Nenhum resultado disponível.</p>;
         }
         return <ResultsTable results={results} />;
