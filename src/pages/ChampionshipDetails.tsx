@@ -116,13 +116,13 @@ const ChampionshipDetails = () => {
         }
         return (
           <div className="px-4">
-            {groups.map(group => (
+            {Array.isArray(groups) && groups.map(group => (
               <GroupTable 
                 key={group.label} 
                 name={`Grupo ${group.label}`}
                 teams={group.teams.map(team => ({
                   teamId: team.team_id || 0,
-                  members: team.members || 0,
+                  members: team.members || "",
                   j: team.games || 0, 
                   p: team.wins || 0, 
                   v: team.wins || 0,

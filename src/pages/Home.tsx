@@ -1,4 +1,3 @@
-
 import { Search, Book, FileText, CheckSquare, Users, MapPin, Mail, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -85,7 +84,7 @@ const Home = () => {
 
   // Get the display name from user data, fallback to 'Usuário'
   const displayName = user?.nickname || user?.full_name || '';
-  const ranking = user?.ranking || 0;
+  const ranking = user?.ranking || 0; // Verificar se ranking existe, senão usar 0
   
   // Use the count from the API responses
   const countPlayers = playersLoading ? 0 : playersData.length;
@@ -127,13 +126,6 @@ const Home = () => {
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-1">Olá</h1>
         <h2 className="text-4xl font-bold mb-4">{displayName}</h2>
-        
-        {/* 
-        <div className="flex gap-4 text-sm">
-          <span className="bg-[#0EA5E9] px-4 py-1 rounded-full">Vôlei</span>
-          <span className="bg-zinc-800/50 text-zinc-400 px-4 py-1 rounded-full">FutVôlei</span>
-          <span className="bg-zinc-800/50 text-zinc-400 px-4 py-1 rounded-full">Beach Tennis</span>
-        </div>Sport Tags */}
       </div>
 
       {/* Ranking Card */}
@@ -193,7 +185,7 @@ const Home = () => {
               </div>
               <span className="text-purple-500 text-2xl font-bold">{stats.recent_championships}</span>
             </div>
-          </button> */}
+          </button> */
 
           {/* Jogadores Card */}
           <button 
