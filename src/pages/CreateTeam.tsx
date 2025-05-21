@@ -19,7 +19,7 @@ type TeamData = {
   championship_id: string;
   team_members: TeamMember[];
 };
-
+const modalityId = "9adbe036-f565-11ef-81b8-be0df3cad36e";
 const CreateTeam = () => {
   const navigate = useNavigate();
   const { id: championshipId } = useParams();
@@ -102,7 +102,7 @@ const CreateTeam = () => {
       console.log("Submitting team data:", teamData);
 
       // Send the team registration to the API
-      const response = await apiClient.post(`/api/championships/${championshipId}/teams`, teamData);
+      const response = await apiClient.post(`/api/championships/${modalityId}/${championshipId}/teams`, teamData);
       
       if (response.data) {
         toast.success("Time criado com sucesso!");
